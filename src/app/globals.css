@@ -1,0 +1,170 @@
+/* Style Reset*/
+@import '../styles/reset.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  || Responsesive Font Size based on Screen Dimensions. Uses custom breakpoint for mobile 420px (mb)
+*/
+@layer base {
+
+  html,
+  body {
+    @apply text-sm mb:text-base md:text-base;
+  }
+
+  body {
+    background-color: theme('colors.hsl.l98');
+    color: theme('colors.hsl.l5');
+  }
+
+  .dark body {
+    background-color: theme('colors.hsl.l10');
+    color: theme('colors.hsl.l95');
+  }
+}
+
+/* 
+  || Utilities - Integration with tailwind
+*/
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /*
+    || Container (Screen layout)
+  */
+  .app-container {
+    --max-width: 1200px;
+    --padding: 2rem;
+    width: min(var(--max-width), 100% - (var(--padding) * 2));
+    margin-inline: auto;
+  }
+
+  @media screen and (max-width: 425px) {
+    .app-container {
+      width: 95%;
+    }
+  }
+
+  /*
+    || Default Button
+  */
+  .btn {
+    outline: none;
+    border: none;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    background-color: theme('colors.hsl.l90');
+    color: theme('colors.hsl.l15');
+  }
+
+  .btn:hover {
+    background-color: theme('colors.hsl.l85');
+    color: theme('colors.hsl.l15');
+  }
+
+  .dark .btn {
+    background-color: theme('colors.hsl.l20');
+    color: theme('colors.hsl.l95');
+  }
+
+  .dark .btn:hover {
+    background-color: theme('colors.hsl.l25');
+    color: theme('colors.hsl.l95');
+  }
+
+  /*
+    || Call to arm button (colorised)
+  */
+  .cta-btn {
+    background-color: theme('colors.mb.pink');
+    color: theme('colors.hsl.l95');
+  }
+
+  .cta-btn:hover {
+    background-color: theme('colors.mb.pink-active');
+    color: theme('colors.hsl.l95');
+  }
+
+  .dark .cta-btn {
+    background-color: theme('colors.mb.yellow');
+    color: theme('colors.hsl.l5');
+  }
+
+  .dark .cta-btn:hover {
+    background-color: theme('colors.mb.yellow-active');
+    color: theme('colors.hsl.l5');
+  }
+
+  .input-resize-content {
+    field-sizing: content;
+  }
+
+  /*
+    || Default Input
+  */
+  .df-input {
+    resize: none;
+    border: none;
+    outline: 1px solid theme('colors.hsl.l90');
+    background-color: theme('colors.hsl.l95');
+    border-radius: 0.25rem;
+    padding: 0.25lh 0.5lh;
+  }
+
+  .dark .df-input {
+    background-color: theme('colors.hsl.l20');
+    outline: 1px solid theme('colors.hsl.l25');
+  }
+
+  .df-input:focus {
+    outline: 1px solid theme('colors.mb.pink');
+  }
+
+  .dark .df-input:focus {
+    outline: 1px solid theme('colors.mb.yellow');
+  }
+
+  .df-input::placeholder {
+    color: theme('colors.hsl.l50');
+  }
+
+
+
+  /*
+    || Custom Scrollbar for Messages Interface
+  */
+  .custom-scrollbar {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-button {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+}
