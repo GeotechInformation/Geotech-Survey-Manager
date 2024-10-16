@@ -1,19 +1,19 @@
 // Question Sortable tsx
 
 import { Question } from "@/types/Question";
-import { useSettingsContext } from "./providers/SettingsProvider";
+import { useSettingsContext } from "../providers/SettingsProvider";
 import { useEffect, useState } from "react";
-import { useThemeContext } from "./providers/ThemeProvider";
-import IconGeneral from "./icons/IconGeneral";
+import { useThemeContext } from "../providers/ThemeProvider";
+import IconGeneral from "../icons/IconGeneral";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
 
 
-interface QuestionCardProps {
+interface QuestionSortableProps {
   qd: Question;
 }
 
-const QuestionSortable: React.FC<QuestionCardProps> = ({ qd }) => {
+const QuestionSortable: React.FC<QuestionSortableProps> = ({ qd }) => {
   const { geoColor } = useSettingsContext();
   const { isDarkTheme } = useThemeContext();
   const [color, setColor] = useState<string>('');
@@ -54,13 +54,10 @@ const QuestionSortable: React.FC<QuestionCardProps> = ({ qd }) => {
   function formatText(input: string): string {
     // Replace asterisks with bold tags
     const boldFormatted = input.replace(/\*([^*]+)\*/g, '<strong>$1</strong>');
-
     // Replace _n with newline <br> tags
     const newLineFormatted = boldFormatted.replace(/_n/g, '<br>');
-
     return newLineFormatted;
   }
-
 
 
   return (
@@ -76,7 +73,7 @@ const QuestionSortable: React.FC<QuestionCardProps> = ({ qd }) => {
 
       <div className="group-hover:flex hidden absolute top-2 right-2  items-center">
         <div className="group/info">
-          <IconGeneral type="help" />
+          <IconGeneral type="help" className="fill-hsl-l15 dark:fill-hsl-l15" />
 
           <div className="group-hover/info:flex flex-col w-max max-w-[200px] justify-center items-center 
           hidden absolute z-20 p-2 rounded-md bg-hsl-l100 shadow-lg border border-hsl-l90 dark:border-hsl-l30">

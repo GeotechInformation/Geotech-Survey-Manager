@@ -9,26 +9,15 @@ import { useSettingsContext } from "../providers/SettingsProvider";
 import { useNotification } from "../providers/NotificationProvider";
 import { useSurveyDataContext } from "../providers/SurveyDataProvider";
 import { generateExcelSurvey } from "@/services";
-import CreateSurveyName from "../modals/CreateSurveyName";
-import SelectExistingSurvey from "../modals/SelectExistingSurvey";
+import { AnimatePresence, motion } from "framer-motion";
+import ToolbarButton from "./ToolbarButton";
+import dynamic from "next/dynamic";
 
-interface ToolbarButtonProps {
-  label: string;
-  icon: string;
-  fnc: (fncParams: any) => void;
-  fncParams?: any;
-}
 
-const ToolbarButton: React.FC<ToolbarButtonProps> = ({ label, icon, fnc }) => {
-  return (
-    <button type="button" onClick={fnc}
-      className="group/item flex items-center gap-x-2 hover:bg-hsl-l98 hover:dark:bg-hsl-l25 px-4 py-4 rounded-md">
-      <IconGeneral type={icon}
-        className="group-hover/item:fill-g-orange group-hover/item:dark:fill-g-blue" />
-      <p className="text-sm group-hover/item:text-g-orange dark:group-hover/item:text-g-blue">{label}</p>
-    </button>
-  );
-}
+const DynCreateSurveyNameModal = dynamic(() => import("../modals/CreateSurveyName"), { loading: () => <></> });
+const DynSelectExistingSurveyModal = dynamic(() => import("../modals/SelectExistingSurvey"), { loading: () => <></> });
+const DynEditQuestionModal = dynamic(() => import("../modals/EditCollectionQuestions"), { loading: () => <></> });
+
 
 const Toolbar = () => {
   const { addNotification } = useNotification();
@@ -38,6 +27,10 @@ const Toolbar = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [selectedSurveyType, setSelectedSurveyType] = useState<string | null>(null);
   const [isSelectSurveyModalOpen, setIsSelectSurveyModalOpen] = useState<boolean>(false);
+  const [isEditQuestionModalOpen, setIsEditQuestionModalOpen] = useState<boolean>(false);
+  const [isCreateQuestionModalOpen, setIsCreateQuestionModalOpen] = useState<boolean>(false);
+  const [isCreateCompModalOpen, setIsCreateCompModalOpen] = useState<boolean>(false);
+
 
 
   const exportToExcel = () => {
@@ -48,6 +41,8 @@ const Toolbar = () => {
       }
 
       /**
+       * **
+       * 
        * LINK SITE DATA
        */
       generateExcelSurvey(collection, null);
@@ -64,11 +59,19 @@ const Toolbar = () => {
     setIsCreateModalOpen(true);
   };
 
-  // Close the modal
+  // Close Create Survey Name modal
   const handleCreateModalClose = () => {
     setIsCreateModalOpen(false);
     setSelectedSurveyType(null);
   };
+
+
+  // Close Editing Modal
+  const closeEditingCollection = () => {
+    setIsEditQuestionModalOpen(false);
+    setIsCreateQuestionModalOpen(false);
+    setIsCreateCompModalOpen(false);
+  }
 
   return (
     <div className="w-full mt-4 px-4 py-1 flex justify-between items-center rounded-md shadow-sm bg-hsl-l100 dark:bg-hsl-l15 border border-hsl-l95 dark:border-none">
@@ -106,10 +109,11 @@ const Toolbar = () => {
 
         {/* Create */}
         <div className="group relative cursor-pointer ">
-          <p className="group-hover:bg-hsl-l95 group-hover:dark:bg-hsl-l20 py-1 px-4 rounded-md font-medium">Create</p>
+          <p className="group-hover:bg-hsl-l95 group-hover:dark:bg-hsl-l20 py-1 px-4 rounded-md font-medium">Edit</p>
           <div className="group-hover:flex flex-col z-50 w-max hidden absolute top-full bg-hsl-l100 dark:bg-hsl-l20 rounded-md shadow-md border border-hsl-l90 dark:border-hsl-l25">
-            <ToolbarButton label="Question" icon="create-question" fnc={() => { }} />
-            <ToolbarButton label="Competitor" icon="create-competitor" fnc={() => { }} />
+            <ToolbarButton label="Edit Questions" icon="edit-question" fnc={() => setIsEditQuestionModalOpen(true)} />
+            <ToolbarButton label="Add Question" icon="create-question" fnc={() => setIsCreateQuestionModalOpen(true)} />
+            <ToolbarButton label="Add Competitor" icon="create-competitor" fnc={() => setIsCreateCompModalOpen(true)} />
           </div>
         </div>
 
@@ -124,7 +128,7 @@ const Toolbar = () => {
             <p className="font-bold">{collectionMetadata.name}</p>
 
             <button type="button" title="Save Changes" className="relative" onClick={saveCollection}>
-              <IconGeneral type="save" />
+              <IconGeneral type="save" className="hover:fill-g-orange hover:dark:fill-g-blue" />
 
               {unsavedChanges && (
                 <div title="Unsaved Changes" className="absolute -top-[50%] -right-[50%] rounded-full ">
@@ -160,8 +164,31 @@ const Toolbar = () => {
         </button>
       </div>
 
-      {isCreateModalOpen && selectedSurveyType && (<CreateSurveyName onClose={handleCreateModalClose} surveyType={selectedSurveyType} />)}
-      {isSelectSurveyModalOpen && (<SelectExistingSurvey onClose={() => setIsSelectSurveyModalOpen(false)} />)}
+      {isCreateModalOpen && selectedSurveyType && (<DynCreateSurveyNameModal onClose={handleCreateModalClose} surveyType={selectedSurveyType} />)}
+      {isSelectSurveyModalOpen && (<DynSelectExistingSurveyModal onClose={() => setIsSelectSurveyModalOpen(false)} />)}
+
+
+      <AnimatePresence>
+        {(isEditQuestionModalOpen || isCreateQuestionModalOpen || isCreateCompModalOpen) && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-end items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="top-0 right-0 bottom-0 h-[100vh] w-[65vw] bg-hsl-l98 dark:bg-hsl-l10 rounded-md"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            >
+              <DynEditQuestionModal isCreatingQuestion={isCreateQuestionModalOpen} isCreatingComp={isCreateCompModalOpen}
+                onClose={closeEditingCollection} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

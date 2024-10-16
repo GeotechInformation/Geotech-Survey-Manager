@@ -4,8 +4,8 @@
 
 import { DndContext, closestCenter, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, rectSortingStrategy, } from '@dnd-kit/sortable';
-import { useSettingsContext } from "./providers/SettingsProvider";
-import { useSurveyDataContext } from "./providers/SurveyDataProvider";
+import { useSettingsContext } from "../providers/SettingsProvider";
+import { useSurveyDataContext } from "../providers/SurveyDataProvider";
 import QuestionSortable from "./QuestionSortable";
 import { Question } from "@/types/Question";
 

@@ -5,7 +5,7 @@
 import { useEffect } from "react";
 import Header from "@/components/layout/Header";
 import { SurveyDataProvider, useSurveyDataContext } from "@/components/providers/SurveyDataProvider";
-import QuestionContainer from "@/components/QuestionContainer";
+import QuestionContainer from "@/components/survey/QuestionContainer";
 import Toolbar from "@/components/toolbar/Toolbar";
 
 function SurveyCreator() {
