@@ -12,7 +12,11 @@ import { generateExcelSurvey } from "@/services";
 import { AnimatePresence, motion } from "framer-motion";
 import ToolbarButton from "./ToolbarButton";
 import dynamic from "next/dynamic";
+import initializeFrequenciesFromSurveys from "@/services/database/initFreqFromSurveys";
+import { extractSurveyTypeIDs } from "@/services/extractSurveyType";
+import { removeSurveyTypeFromMasterCollection } from "@/services/removeSurveyType";
 
+type EditActionType = 'none' | 'interchange' | 'createQuestion' | 'editQuestion' | 'createComp';
 
 const DynCreateSurveyNameModal = dynamic(() => import("../modals/CreateSurveyName"), { loading: () => <></> });
 const DynSelectExistingSurveyModal = dynamic(() => import("../modals/SelectExistingSurvey"), { loading: () => <></> });
@@ -21,16 +25,13 @@ const DynEditQuestionModal = dynamic(() => import("../modals/EditCollectionQuest
 
 const Toolbar = () => {
   const { addNotification } = useNotification();
-  const { collection, collectionMetadata, saveCollection, unsavedChanges } = useSurveyDataContext();
+  const { collection, collectionMetadata, saveCollection, unsavedChanges, deleteAllData } = useSurveyDataContext();
   const { geoColor, setGeoColor, QGridColumns, setQGridColumns } = useSettingsContext();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [selectedSurveyType, setSelectedSurveyType] = useState<string | null>(null);
   const [isSelectSurveyModalOpen, setIsSelectSurveyModalOpen] = useState<boolean>(false);
-  const [isEditQuestionModalOpen, setIsEditQuestionModalOpen] = useState<boolean>(false);
-  const [isCreateQuestionModalOpen, setIsCreateQuestionModalOpen] = useState<boolean>(false);
-  const [isCreateCompModalOpen, setIsCreateCompModalOpen] = useState<boolean>(false);
-
+  const [editSurveyAction, setEditSurveyAction] = useState<EditActionType>('none');
 
 
   const exportToExcel = () => {
@@ -65,16 +66,28 @@ const Toolbar = () => {
     setSelectedSurveyType(null);
   };
 
+  const openEditSurveyModal = (action: EditActionType) => {
+    if (!collection) {
+      addNotification("Create a new or load an existing survey to edit", "neutral");
+      return;
+    }
+    setEditSurveyAction(action)
+  };
 
-  // Close Editing Modal
-  const closeEditingCollection = () => {
-    setIsEditQuestionModalOpen(false);
-    setIsCreateQuestionModalOpen(false);
-    setIsCreateCompModalOpen(false);
+
+  const DO_STUFF = async () => {
+    // const dbs = ['CollectionNameHere'];
+    // await initializeFrequenciesFromSurveys(dbs);
+
+    // await extractSurveyTypeIDs();
+
+    // await removeSurveyTypeFromMasterCollection();
   }
 
   return (
     <div className="w-full mt-4 px-4 py-1 flex justify-between items-center rounded-md shadow-sm bg-hsl-l100 dark:bg-hsl-l15 border border-hsl-l95 dark:border-none">
+
+      {/* <button onClick={DO_STUFF}>DO_STUFF</button> */}
 
       <div className="flex gap-x-4 items-center">
         {/* FILE */}
@@ -111,9 +124,10 @@ const Toolbar = () => {
         <div className="group relative cursor-pointer ">
           <p className="group-hover:bg-hsl-l95 group-hover:dark:bg-hsl-l20 py-1 px-4 rounded-md font-medium">Edit</p>
           <div className="group-hover:flex flex-col z-50 w-max hidden absolute top-full bg-hsl-l100 dark:bg-hsl-l20 rounded-md shadow-md border border-hsl-l90 dark:border-hsl-l25">
-            <ToolbarButton label="Edit Questions" icon="edit-question" fnc={() => setIsEditQuestionModalOpen(true)} />
-            <ToolbarButton label="Add Question" icon="create-question" fnc={() => setIsCreateQuestionModalOpen(true)} />
-            <ToolbarButton label="Add Competitor" icon="create-competitor" fnc={() => setIsCreateCompModalOpen(true)} />
+            <ToolbarButton label="Add / Remove Questions" icon="swap" fnc={() => openEditSurveyModal('interchange')} />
+            <ToolbarButton label="Edit Questions" icon="edit-question" fnc={() => openEditSurveyModal('editQuestion')} />
+            <ToolbarButton label="Create Question" icon="create-question" fnc={() => openEditSurveyModal('createQuestion')} />
+            <ToolbarButton label="Create Competitor" icon="create-competitor" fnc={() => openEditSurveyModal('createComp')} />
           </div>
         </div>
 
@@ -158,7 +172,7 @@ const Toolbar = () => {
           <IconGeneral type="preview" />
         </button>
 
-        <button type="button" title="Delete All" onClick={() => { }}
+        <button type="button" title="Delete All" onClick={deleteAllData}
           className="group px-2 py-2 hover:bg-hsl-l95 hover:dark:bg-hsl-l20 rounded-md flex-shrink-0">
           <IconGeneral type="delete" className="group-hover:fill-red-500 group-hover:dark:fill-red-600" />
         </button>
@@ -169,7 +183,7 @@ const Toolbar = () => {
 
 
       <AnimatePresence>
-        {(isEditQuestionModalOpen || isCreateQuestionModalOpen || isCreateCompModalOpen) && (
+        {editSurveyAction !== 'none' && (
           <motion.div
             className="fixed inset-0 bg-black bg-opacity-50 flex justify-end items-center z-50"
             initial={{ opacity: 0 }}
@@ -183,8 +197,7 @@ const Toolbar = () => {
               exit={{ x: "100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
-              <DynEditQuestionModal isCreatingQuestion={isCreateQuestionModalOpen} isCreatingComp={isCreateCompModalOpen}
-                onClose={closeEditingCollection} />
+              <DynEditQuestionModal action={editSurveyAction} onClose={() => setEditSurveyAction('none')} />
             </motion.div>
           </motion.div>
         )}

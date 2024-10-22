@@ -11,7 +11,7 @@ import { Question } from "@/types/Question";
 
 const QuestionContainer = () => {
   const { QGridColumns } = useSettingsContext();
-  const { collection, setCollection } = useSurveyDataContext();
+  const { collection, setCollection, setUnsavedChanges } = useSurveyDataContext();
 
   const gridColsClasses = ['grid-cols-1', 'grid-cols-2', 'grid-cols-3', 'grid-cols-4', 'grid-cols-5',
     'grid-cols-6', 'grid-cols-7', 'grid-cols-8', 'grid-cols-9', 'grid-cols-10', 'grid-cols-11', 'grid-cols-12'];
@@ -28,6 +28,7 @@ const QuestionContainer = () => {
     const { active, over } = event;
 
     if (active.id !== over.id) {
+      setUnsavedChanges(true);
       const oldIndex = collection.findIndex((question: Question) => question.id === active.id);
       const newIndex = collection.findIndex((question: Question) => question.id === over.id);
 
@@ -43,7 +44,6 @@ const QuestionContainer = () => {
         }));
       });
 
-      console.log(collection);
     }
   };
 

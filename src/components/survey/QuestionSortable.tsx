@@ -25,6 +25,7 @@ const QuestionSortable: React.FC<QuestionSortableProps> = ({ qd }) => {
   const style = { transform: CSS.Transform.toString(transform), transition };
 
   useEffect(() => {
+    if (!qd.color) return;
     const convertARGBtoHEX = () => {
       const baseColor = "#" + qd.color.slice(2);
       const adjustedColor = isDarkTheme ? darkenColor(baseColor, 0.15) : baseColor;

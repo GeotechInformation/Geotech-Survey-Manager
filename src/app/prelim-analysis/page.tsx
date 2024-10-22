@@ -6,19 +6,21 @@ import Header from "@/components/layout/Header";
 import { AnalysisDataProvider } from "@/components/providers/AnalysisDataProvider";
 import FileInput from "@/components/analysis/FileInput";
 import SurveyNameInput from "@/components/analysis/SurveyNameInput";
-import migrateQuestions from "@/services/migrateQuestion";
 import SurveyValidateButton from "@/components/analysis/SurveyValidateButton";
 import AIOMergeButton from "@/components/analysis/AIOMergeButton";
 import AnalyseButton from "@/components/analysis/AnalyseButton";
 import DownloadButton from "@/components/analysis/DownloadButton";
 import Preview from "@/components/analysis/Preview";
 
+import renameCollection from "@/services/renameCollection";
+import migrateQuestions from "@/services/migrateQuestion";
 
 function PrelimAnalysis() {
 
   const updateBackEnd = async () => {
     try {
-      await migrateQuestions('MasterSurveyCollection');
+      // await migrateQuestions('CompetitionSurveyCollection');
+      // await renameCollection();
     } catch (error) {
       console.log(error);
     }

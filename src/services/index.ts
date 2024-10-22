@@ -8,6 +8,9 @@ export { default as getCollectionQuestions } from '@/services/database/getCollec
 export { default as checkSurveyNameExistsInB } from '@/services/database/checkSurveyNameExistsInDB';
 export { default as saveCollectionInDB } from '@/services/database/saveCollectionInDB';
 export { default as getExistingCollectionMetadata } from '@/services/database/getExistingCollectionMetadata';
+export { default as updateQuestionFrequency } from '@/services/database/updateQuestionFrequency';
+export { default as createQuestion } from '@/services/database/createQuestion';
+export { default as getQuestionIdsForSurveyType } from '@/services/database/getQuestionIdsForSurveyType';
 
 // Data Processing
 export { default as xlToCleanedDataframe } from '@/services/dataProcessing/xlToCleanedDataframe';
@@ -18,5 +21,6 @@ export { default as mergeData } from '@/services/dataProcessing/mergeData';
 export { default as analyseData } from '@/services/dataProcessing/analyseData';
 export { default as buildMetadata } from '@/services/dataProcessing/buildMetadata';
 
+// Utils
 export { default as generateExcelAIO } from '@/services/utils/generateExcelAIO';
 export { default as generateExcelSurvey } from '@/services/utils/generateExcelSurvey';

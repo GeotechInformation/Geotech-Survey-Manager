@@ -1,34 +1,48 @@
-// Create Survey Name tsx
+// Edit Collection Question Modal tsx
 
 "use client";
 
-import { useNotification } from "../providers/NotificationProvider";
 import { useEffect, useRef, useState } from "react";
-import { useSurveyDataContext } from "../providers/SurveyDataProvider";
-import QuestionDefault from "../survey/QuestionDefault";
-import IconGeneral from "../icons/IconGeneral";
-import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
+import dynamic from "next/dynamic";
+import ToolbarEditModal from "../toolbar/ToolbarEditModal";
+import IconGeneral from "../icons/IconGeneral";
+
+const DynInterchangeQuestions = dynamic(() => import("../survey/editor/InterchangeQuestions"), { loading: () => <></> });
+const DynEditQuestions = dynamic(() => import("../survey/editor/EditQuestions"), { loading: () => <></> });
+const DynCreateCompetitor = dynamic(() => import("../survey/editor/CreateCompetitor"), { loading: () => <></> });
+const DynCreateQuestion = dynamic(() => import("../survey/editor/CreateQuestion"), { loading: () => <></> });
 
 
-const DynCreateCompetitor = dynamic(() => import("../survey/CreateCompetitor"), { loading: () => <></> });
-const DynCreateQuestion = dynamic(() => import("../survey/CreateQuestion"), { loading: () => <></> });
+type ActionType = 'interchange' | 'editQuestion' | 'createQuestion' | 'createComp';
+const actionOrder = { interchange: 0, editQuestion: 1, createQuestion: 2, createComp: 3 };
+
+const variants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? 1000 : -1000,
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction < 0 ? 1000 : -1000,
+    opacity: 0,
+  }),
+};
 
 
 interface EditCollectionQuestionsProps {
-  isCreatingQuestion: boolean;
-  isCreatingComp: boolean;
+  action: ActionType;
   onClose: () => void;
 }
 
-const EditCollectionQuestions: React.FC<EditCollectionQuestionsProps> = ({ isCreatingQuestion, isCreatingComp, onClose }) => {
+const EditCollectionQuestions: React.FC<EditCollectionQuestionsProps> = ({ action, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  const { addNotification } = useNotification();
-  const { collection, setCollection, collectionMaster, setUnsavedChanges } = useSurveyDataContext();
-  const [isCreateQuestion, setIsCreateQuestion] = useState<boolean>(isCreatingQuestion);
-  const [isCreateComp, setIsCreateComp] = useState<boolean>(isCreatingComp);
+  const [curAction, setCurAction] = useState<ActionType>(action);
+  const [direction, setDirection] = useState<number>(0);
 
-  // Handle clicking outside and pressing the Esc key
   useEffect(() => {
     document.body.style.overflow = "hidden"; // Disable scrolling
 
@@ -37,7 +51,6 @@ const EditCollectionQuestions: React.FC<EditCollectionQuestionsProps> = ({ isCre
     };
     const handleEscapePress = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
-
     };
     document.addEventListener("mousedown", handleOutsideClick);
     document.addEventListener("keydown", handleEscapePress);
@@ -49,46 +62,16 @@ const EditCollectionQuestions: React.FC<EditCollectionQuestionsProps> = ({ isCre
     };
   }, [onClose]);
 
-  const toggleCreateQuestion = () => {
-    setIsCreateQuestion(!isCreateQuestion);
-    setIsCreateComp(false);
-  }
-
-  const toggleCreateComp = () => {
-    setIsCreateComp(!isCreateComp);
-    setIsCreateQuestion(false);
-  }
-
-
-  /**
-   * Toggle Question (in/out of collection)
-   * @param qid 
-   * @returns 
-   */
-  const toggleQuestion = (qid: string) => {
-    if (!collection || !collectionMaster) {
-      addNotification("Template Survey must be initialised", "error");
-      return
-    };
-
-    setUnsavedChanges(true); // Track Changes
-
-    if (collection.some((q) => q.id === qid)) {
-      // Remove the question from the collection
-      setCollection(collection.filter((q) => q.id !== qid));
-    } else {
-      // Find the question in the collectionMaster
-      const questionToAdd = collectionMaster.find((q) => q.id === qid);
-      if (questionToAdd) {
-        setCollection([...collection, questionToAdd]); // Add the question to the collection
-      }
-    }
+  // Handle action change with direction for animation
+  const handleActionChange = (newAction: ActionType) => {
+    const newDirection = actionOrder[newAction] > actionOrder[curAction] ? 1 : -1;
+    setDirection(newDirection);
+    setCurAction(newAction);
   };
-
 
   return (
     <div ref={modalRef} className="h-full w-full overflow-y-auto px-8 py-8">
-
+      {/* Title */}
       <div className="flex justify-between items-center mb-8">
         <div onClick={onClose} className="cursor-pointer ml-4">
           <IconGeneral type="arrow-back" size={30} className="hover:fill-g-orange hover:dark:fill-g-blue" />
@@ -97,52 +80,31 @@ const EditCollectionQuestions: React.FC<EditCollectionQuestionsProps> = ({ isCre
         <IconGeneral type="arrow-back" size={30} className="fill-transparent dark:fill-transparent" />
       </div>
 
-      <div className="w-full px-4 py-2 flex items-center rounded-md shadow-sm bg-hsl-l100 dark:bg-hsl-l15 border border-hsl-l95 dark:border-none">
-        <button type="button" className="group relative cursor-pointer" onClick={toggleCreateQuestion}>
-          <p className="group-hover:bg-hsl-l95 group-hover:dark:bg-hsl-l20 py-1 px-4 rounded-md font-medium">Create Question</p>
-        </button>
+      {/* Tool Bar */}
+      <ToolbarEditModal curAction={curAction} setCurAction={handleActionChange} />
 
-        <button type="button" className="group relative cursor-pointer" onClick={toggleCreateComp}>
-          <p className="group-hover:bg-hsl-l95 group-hover:dark:bg-hsl-l20 py-1 px-4 rounded-md font-medium">Create Competitor</p>
-        </button>
-      </div>
-
-
-      <AnimatePresence>
-        {isCreateQuestion && (
+      <div className="relative">
+        <AnimatePresence initial={false} custom={direction}>
           <motion.div
-            initial={{ opacity: 0, scale: 0.5, x: "100%" }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            key={curAction}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: "spring", stiffness: 300, damping: 30 },
+              opacity: { duration: 0.2 },
+            }}
+            className="absolute w-full"
           >
-            <DynCreateQuestion />
+            {curAction === 'interchange' && <DynInterchangeQuestions />}
+            {curAction === 'createQuestion' && <DynCreateQuestion />}
+            {curAction === 'editQuestion' && (<DynEditQuestions />)}
+            {curAction === 'createComp' && <DynCreateCompetitor />}
           </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {isCreateComp && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5, x: "100%" }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          >
-            <DynCreateCompetitor />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-
-      <h3 className="font-semibold text-2xl mt-8 mx-4 mb-2">Add / Remove Questions</h3>
-      <div className={`grid grid-cols-5 gap-x-5 gap-y-5`}>
-        {collection && collectionMaster?.map((question) => (
-          <QuestionDefault key={question.id} qd={question} inCollection={collection.some((q) => q.id === question.id)} onToggle={toggleQuestion} />
-        ))}
+        </AnimatePresence>
       </div>
-
-
     </div>
   );
 };

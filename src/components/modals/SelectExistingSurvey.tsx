@@ -14,7 +14,7 @@ interface SelectExistingSurveyProps {
 
 const SelectExistingSurvey: React.FC<SelectExistingSurveyProps> = ({ onClose }) => {
   const { addNotification } = useNotification();
-  const { setCollection, setCollectionMetadata } = useSurveyDataContext();
+  const { setCollection, setCollectionMetadata, setUnsavedChanges } = useSurveyDataContext();
   const [surveyMetadata, setSurveyMetadata] = useState<Record<string, CollectionMetadata[]> | null>(null);
 
 
@@ -71,6 +71,7 @@ const SelectExistingSurvey: React.FC<SelectExistingSurveyProps> = ({ onClose }) 
         }
       });
 
+      setUnsavedChanges(false); // Refresh save
       onClose();
     } catch (error) {
       addNotification("Error loading survey", "error");
@@ -80,7 +81,7 @@ const SelectExistingSurvey: React.FC<SelectExistingSurveyProps> = ({ onClose }) 
 
   return (createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="relative max-h-[80vh] min-w-[40vw] flex flex-col rounded-md shadow-sm py-8 px-8 
+      <div className="relative max-h-[90vh] min-w-[40vw] flex flex-col rounded-md shadow-sm py-8 px-8 
         bg-hsl-l100 dark:bg-hsl-l15"
       >
         <button onClick={onClose}

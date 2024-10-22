@@ -50,19 +50,6 @@ export default async function migrateQuestions(collectionName: string): Promise<
       const docRef = doc(db, collectionName, docSnapshot.id);
       await setDoc(docRef, newData);
 
-      // // Update document with new data
-      // const docRef = doc(db, collectionName, docSnapshot.id);
-      // await updateDoc(docRef, {
-      //   id: newData.id,
-      //   index: newData.index,
-      //   question: newData.question,
-      //   category: newData.category,
-      //   color: newData.color,
-      //   comment: newData.comment,
-      //   responseType: newData.responseType,
-      //   validBounds: newData.validBounds,
-      //   surveyType: newData.surveyType
-      // });
     }
 
     console.log(`Migration for collection ${collectionName} completed.`);

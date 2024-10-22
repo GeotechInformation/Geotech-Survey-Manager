@@ -5,7 +5,7 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { useNotification } from './NotificationProvider';
-import { getCollectionQuestions, saveCollectionInDB } from '@/services';
+import { getCollectionQuestions, getQuestionIdsForSurveyType, saveCollectionInDB, updateQuestionFrequency } from '@/services';
 import { Question } from '@/types/Question';
 import { CollectionMetadata } from '@/types/CollectionMetadata';
 
@@ -14,6 +14,8 @@ interface SurveyDataContextType {
   setCollection: React.Dispatch<React.SetStateAction<Question[] | null>>;
   collectionMaster: Question[] | null;
   setCollectionMaster: React.Dispatch<React.SetStateAction<Question[] | null>>;
+  collectionCompetitors: Question[] | null;
+  setCollectionCompetitors: React.Dispatch<React.SetStateAction<Question[] | null>>;
   // Collection Metadata
   collectionMetadata: CollectionMetadata | null;
   setCollectionMetadata: React.Dispatch<React.SetStateAction<CollectionMetadata | null>>;
@@ -43,15 +45,18 @@ export const SurveyDataProvider: React.FC<{ children: ReactNode }> = ({ children
   const { addNotification } = useNotification();
   const [collection, setCollection] = useState<Question[] | null>(null);
   const [collectionMaster, setCollectionMaster] = useState<Question[] | null>(null);
+  const [collectionCompetitors, setCollectionCompetitors] = useState<Question[] | null>(null);
   const [collectionMetadata, setCollectionMetadata] = useState<CollectionMetadata | null>(null);
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
 
-
+  /**
+   * Get Master Questions
+   */
   useEffect(() => {
     if (!addNotification) return;
     const getMasterQuestions = async () => {
       try {
-        const response = await getCollectionQuestions('MasterSurveyCollection');
+        const response = await getCollectionQuestions('#_MasterCollection');
         if ('success' in response) {
           if (!response.success) {
             addNotification(response.message!, 'error');
@@ -62,13 +67,45 @@ export const SurveyDataProvider: React.FC<{ children: ReactNode }> = ({ children
           setCollectionMaster(response);
         }
       } catch (error) {
-        addNotification('An Error Occurred. Please refresh', 'error');
-        console.error(error)
+        addNotification('Error Fetching Data. Please refresh', 'error');
+        console.error(error);
       }
     }
 
     getMasterQuestions();
-  }, [addNotification, getCollectionQuestions])
+  }, [addNotification, getCollectionQuestions]);
+
+  /**
+   * Get Competitor Questions
+   */
+  useEffect(() => {
+    if (!addNotification) return;
+    const getCompetitorQuestions = async () => {
+      try {
+        const response = await getCollectionQuestions('#_CompetitorCollection');
+        if ('success' in response) {
+          if (!response.success) {
+            addNotification(response.message!, 'error');
+            return;
+          }
+        }
+        if (Array.isArray(response)) {
+          // Sort the questions alphabetically by name (or any other field you prefer)
+          const sortedCompetitors = response.sort((a, b) =>
+            a.question.localeCompare(b.question)
+          );
+
+          // Set the sorted competitors into state
+          setCollectionCompetitors(sortedCompetitors);
+        }
+      } catch (error) {
+        addNotification('Error Fetching Data. Please refresh', 'error');
+        console.error(error);
+      }
+    }
+
+    getCompetitorQuestions();
+  }, [addNotification, getCollectionQuestions]);
 
 
   /**
@@ -77,28 +114,46 @@ export const SurveyDataProvider: React.FC<{ children: ReactNode }> = ({ children
    * @param surveyType 
    * @returns 
    */
-  const createTemplateSurvey = (surveyName: string, surveyType: string) => {
+  const createTemplateSurvey = async (surveyName: string, surveyType: string) => {
     if (!collectionMaster) {
       addNotification("Collection Master is not initliased", "error");
       return;
     }
+
     const metadata: CollectionMetadata = {
       name: surveyName,
       createdAt: Timestamp.now(),
       lastSaved: Timestamp.now()
     }
-    setCollectionMetadata(metadata)
+
+    setCollectionMetadata(metadata);
     setUnsavedChanges(true);
 
-    if (surveyType === "all") {
-      setCollection(collectionMaster);
-    } else {
-      const filteredCollection = collectionMaster.filter((item) => {
-        return item.surveyType?.[surveyType as keyof Question["surveyType"]] === true;
-      });
-      setCollection(filteredCollection);
+    let selectedQuestions: Question[] = [];
+
+    try {
+      // Filter the collection based on the survey type or select all
+      if (surveyType === "all") {
+        selectedQuestions = collectionMaster;
+      } else {
+        const questionIds = await getQuestionIdsForSurveyType(surveyType);
+        selectedQuestions = collectionMaster.filter((item) => questionIds.includes(item.id));
+      }
+
+      // Set the filtered questions to the survey
+      setCollection(selectedQuestions);
+
+      // Update the frequency field in master collection
+      for (const question of selectedQuestions) {
+        await updateQuestionFrequency(question.id, false, 1);
+      }
+
+      addNotification("Template survey created successfully!", "success");
+    } catch (error) {
+      addNotification("Error updating frequency. Can be ignored", "neutral")
+      console.error(error);
     }
-  }
+  };
 
   /**
    * Save Collection
@@ -121,20 +176,20 @@ export const SurveyDataProvider: React.FC<{ children: ReactNode }> = ({ children
       addNotification("Error saving survey", 'error');
       console.error("Error saving collection in DB: ", error);
     }
-  }
+  };
 
   const deleteAllData = () => {
     setCollection(null);
     setCollectionMetadata(null);
     setUnsavedChanges(false);
-  }
+  };
 
 
 
   return (
     <SurveyDataContext.Provider
       value={{
-        collection, setCollection, collectionMaster, setCollectionMaster,
+        collection, setCollection, collectionMaster, setCollectionMaster, collectionCompetitors, setCollectionCompetitors,
         collectionMetadata, setCollectionMetadata, unsavedChanges, setUnsavedChanges,
         createTemplateSurvey, saveCollection, deleteAllData
       }}>

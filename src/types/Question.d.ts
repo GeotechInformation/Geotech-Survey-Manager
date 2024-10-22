@@ -20,6 +20,7 @@ export interface Question {
     shoppingCentre: boolean;
     foodPrecinct: boolean;
   }
+  frequency?: number;
 }
 
 /**
