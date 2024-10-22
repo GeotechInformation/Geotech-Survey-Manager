@@ -1,4 +1,4 @@
-import { doc, increment, updateDoc } from "firebase/firestore";
+import { doc, getDoc, increment, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebaseConfig";
 
 /**
@@ -12,10 +12,17 @@ export default async function updateQuestionFrequency(questionId: string, isComp
     const collectionName = isCompetitor ? "#_CompetitorCollection" : "#_MasterCollection";
     const questionDocRef = doc(db, collectionName, questionId);
 
+    // Check if the document exists before updating
+    const docSnap = await getDoc(questionDocRef);
+
     // Increment or decrement the frequency field based on the `change` value
-    await updateDoc(questionDocRef, {
-      frequency: increment(change),
-    });
+    if (docSnap.exists()) {
+      await updateDoc(questionDocRef, {
+        frequency: increment(change),
+      });
+    } else {
+      console.log(`Question ID: ${questionId} not found in ${collectionName}`);
+    }
 
   } catch (error) {
     console.error(`Error updating frequency for question: ${questionId}`, error);

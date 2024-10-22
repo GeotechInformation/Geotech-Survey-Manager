@@ -5,7 +5,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import ToolbarEditModal from "../toolbar/ToolbarEditModal";
+import ToolbarEditModal from "../survey/editor/ToolbarEditModal";
 import IconGeneral from "../icons/IconGeneral";
 
 const DynInterchangeQuestions = dynamic(() => import("../survey/editor/InterchangeQuestions"), { loading: () => <></> });
@@ -96,7 +96,7 @@ const EditCollectionQuestions: React.FC<EditCollectionQuestionsProps> = ({ actio
               x: { type: "spring", stiffness: 300, damping: 30 },
               opacity: { duration: 0.2 },
             }}
-            className="absolute w-full"
+            className="absolute w-full pb-8"
           >
             {curAction === 'interchange' && <DynInterchangeQuestions />}
             {curAction === 'createQuestion' && <DynCreateQuestion />}

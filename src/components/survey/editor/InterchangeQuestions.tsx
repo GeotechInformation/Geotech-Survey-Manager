@@ -34,7 +34,14 @@ const InterchangeQuestions = () => {
       } else {
         const questionToAdd = collectionMaster?.find((q) => q.id === qid);
         if (questionToAdd) {
-          setCollection([...collection, questionToAdd]);
+          const questionIndex = questionToAdd.index;
+
+          // Insert the question back into the collection at the specified `index`
+          const newCollection = [...collection];
+          newCollection.splice(questionIndex, 0, questionToAdd);
+
+          // Update the collection with the new order
+          setCollection(newCollection);
           await updateQuestionFrequency(qid, isCompetitor, 1);
         }
       }
@@ -44,14 +51,28 @@ const InterchangeQuestions = () => {
     }
   };
 
+
+  // Merge collection and collectionMaster while prioritizing collection (to include custom questions)
+  const customQuestions = collection ? collection.filter(q => !collectionMaster?.some(mq => mq.id === q.id)) : [];
+
+
   return (
     <div>
       <h3 className="font-semibold text-2xl mt-8 mx-4 mb-2">Add / Remove Questions</h3>
 
+
       <div className={`grid grid-cols-5 gap-x-5 gap-y-5`}>
-        {collection && collectionMaster?.map((question) => (
+        {/* Render all questions from collectionMaster first */}
+        {collection && collectionMaster && collectionMaster.map((question) => (
           <QuestionDefault key={question.id} qd={question}
             inCollection={collection.some((q) => q.id === question.id)}
+            onToggle={() => toggleQuestion(question.id)} />
+        ))}
+
+        {/* Render custom questions that are not part of collectionMaster */}
+        {customQuestions.map((question) => (
+          <QuestionDefault key={question.id} qd={question}
+            inCollection={true} // These are always part of the collection
             onToggle={() => toggleQuestion(question.id)} />
         ))}
       </div>

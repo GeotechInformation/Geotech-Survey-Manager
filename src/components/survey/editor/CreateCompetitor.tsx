@@ -7,7 +7,8 @@ import IconGeneral from "../../icons/IconGeneral";
 import QuestionDefault from "../QuestionDefault";
 import { useSurveyDataContext } from "../../providers/SurveyDataProvider";
 import { useNotification } from "../../providers/NotificationProvider";
-import { updateQuestionFrequency } from "@/services";
+import { createQuestion, updateQuestionFrequency } from "@/services";
+import { Question } from "@/types/Question";
 
 interface Competitor {
   name: string;
@@ -18,6 +19,7 @@ interface Competitor {
   in500: boolean;
   custom: string;
 }
+
 const blankCompetitor = { name: '', inSight: false, in250: false, inSightOr250: false, inCentre: false, in500: false, custom: '' };
 
 const CreateCompetitor = () => {
@@ -34,7 +36,9 @@ const CreateCompetitor = () => {
 
   // Update competitor field
   const updateCompetitorField = (idx: number, field: keyof Competitor, value: any) => {
-    const updatedCompetitors = competitors.map((comp, i) => i === idx ? { ...comp, [field]: value } : comp);
+    const updatedCompetitors = competitors.map((comp, i) =>
+      i === idx ? { ...comp, [field]: value } : comp
+    );
     setCompetitors(updatedCompetitors);
   };
 
@@ -49,6 +53,97 @@ const CreateCompetitor = () => {
     const updatedCompetitors = competitors.filter((_, i) => i !== idx);
     setCompetitors(updatedCompetitors);
   };
+
+  /**
+  * Create Competitors in Database
+  */
+  const createCompetitorsInDB = async () => {
+    if (!collection || !collectionCompetitors) {
+      addNotification("Existing collection must be loaded", "error");
+      return;
+    }
+    // Filter out competitors without a name
+    const validCompetitors = competitors.filter(comp => comp.name.trim());
+
+    // No competitors to add
+    if (validCompetitors.length === 0) return;
+
+    try {
+      let allCompQuestionObjects = [];
+
+      // Process each valid competitor
+      for (const comp of validCompetitors) {
+        // Check if at least one distance field is selected
+        const hasDistance =
+          comp.inSight || comp.in250 || comp.inSightOr250 || comp.inCentre || comp.in500 || comp.custom.trim().length > 0;
+
+        if (!hasDistance) {
+          addNotification(`Competitor ${comp.name} must have at least one distance selected`, "error");
+          return;
+        }
+
+        // Add competitor questions based on selected fields
+        if (comp.inSightOr250) {
+          allCompQuestionObjects.push({ id: `CiSight-250m-${comp.name}`, question: `${comp.name} in Sight or 250m` });
+        }
+        if (comp.inSight) {
+          allCompQuestionObjects.push({ id: `CiSight-${comp.name}`, question: `${comp.name} in Sight` });
+        }
+        if (comp.inCentre) {
+          allCompQuestionObjects.push({ id: `CiCentre-${comp.name}`, question: `${comp.name} in Centre` });
+        }
+        if (comp.in250) {
+          allCompQuestionObjects.push({ id: `Ci250m-${comp.name}`, question: `${comp.name} in 250m` });
+        }
+        if (comp.in500) {
+          allCompQuestionObjects.push({ id: `Ci500m-${comp.name}`, question: `${comp.name} in 500m` });
+        }
+        if (comp.custom.trim().length > 0) {
+          allCompQuestionObjects.push({ id: `CiDist-${comp.name}`, question: `${comp.name} in ${comp.custom}` });
+        }
+      }
+
+      // Now, add all competitor questions to the database
+      for (const compQuestion of allCompQuestionObjects) {
+        const question: Question = {
+          id: compQuestion.id,
+          index: 999,
+          question: compQuestion.question,
+          category: "Competitor",
+          color: "default",
+          comment: "Competitor data",
+          responseType: "custom",
+          validBounds: { min: 0, max: 1, options: "" },
+        };
+
+        await createQuestion("competitors", question);
+
+        // Insert competitor before the first "COM" question
+        const comIndex = collection.findIndex((q) => q.id.startsWith("COM"));
+        const insertIndex = comIndex === -1 ? collection.length : comIndex;
+
+        // Update collection by inserting at the correct position
+        const updatedCollection = [
+          ...collection.slice(0, insertIndex),
+          question,
+          ...collection.slice(insertIndex),
+        ];
+
+        setCollection(updatedCollection);
+
+        // Update collectionCompetitors as well
+        setCollectionCompetitors((prevCompetitors) =>
+          prevCompetitors ? [...prevCompetitors, question] : [question]
+        );
+      }
+
+      addNotification("Competitors successfully added to the database", "success");
+    } catch (error) {
+      console.error("Error creating competitors: ", error);
+      addNotification("Error creating competitors", "error");
+    }
+  };
+
 
   /**
    * Toggle Question or Competitor (in/out of collection) and update frequency
@@ -116,16 +211,11 @@ const CreateCompetitor = () => {
   return (
     <div>
       <div className="w-full px-4 py-4 my-4 rounded-md shadow-sm bg-hsl-l100 dark:bg-hsl-l15 border border-hsl-l95 dark:border-none">
-        <div className="flex items-center gap-x-4 mb-4">
+        <div className="flex items-center gap-x-4 mb-2">
           <h3 className="font-semibold text-lg">Create Competitors</h3>
-          <button type="button" onClick={addCompetitor}
-            className="flex items-center text-sm px-1 py-1 pr-2 text-white bg-cyan-500 hover:bg-cyan-400 rounded-md cursor-pointer dark:bg-cyan-600 dark:hover:bg-cyan-700">
-            <IconGeneral type="add" className="fill-white dark:fill-white" size={20} />
-            Add
-          </button>
         </div>
 
-        <div className="flex flex-col gap-y-6">
+        <div className="flex flex-col gap-y-4">
           {competitors.map((comp, idx) => (
             <div key={idx} className="flex justify-between items-center">
               {/* Name */}
@@ -164,6 +254,11 @@ const CreateCompetitor = () => {
               ${comp.in500 ? 'bg-g-orange dark:bg-g-blue text-white' : 'bg-hsl-l95 dark:bg-hsl-l20'}`}>
                   In 500
                 </button>
+
+                <input type="text" placeholder="Custom"
+                  className="df-input leading-3 text-sm max-w-[100px]"
+                  value={comp.custom}
+                  onChange={(e) => updateCompetitorField(idx, 'custom', e.target.value)} />
               </div>
 
               {/* Delete */}
@@ -172,6 +267,18 @@ const CreateCompetitor = () => {
               </button>
             </div>
           ))}
+        </div>
+
+        <button type="button" onClick={addCompetitor}
+          className="flex items-center text-sm mt-4 px-1 py-1 pr-2 rounded-md cursor-pointer
+             bg-hsl-l95 dark:bg-hsl-l20 hover:bg-hsl-l98 dark:hover:bg-hsl-l25">
+          <IconGeneral type="add" className="fill-black dark:fill-white" size={20} />
+          Add Another Competitor
+        </button>
+
+        <div className="flex justify-end mt-8">
+          <button type="button" onClick={createCompetitorsInDB}
+            className="px-4 py-2 rounded-md bg-hsl-l95 dark:bg-hsl-l20 hover:bg-hsl-l98 dark:hover:bg-hsl-l25">Create Competitors</button>
         </div>
       </div>
 
