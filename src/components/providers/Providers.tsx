@@ -2,6 +2,7 @@
 
 'use client';
 
+import { AuthProvider } from "./AuthProvider";
 import { NotificationProvider } from "./NotificationProvider";
 import { SettingsProvider } from "./SettingsProvider";
 import { ThemeProvider } from "./ThemeProvider";
@@ -13,12 +14,14 @@ interface ProvidersProps {
 
 export default function Providers({ children }: ProvidersProps) {
   return (
-    <NotificationProvider>
-      <ThemeProvider>
-        <SettingsProvider>
-          {children}
-        </SettingsProvider>
-      </ThemeProvider>
-    </NotificationProvider>
+    <AuthProvider>
+      <NotificationProvider>
+        <ThemeProvider>
+          <SettingsProvider>
+            {children}
+          </SettingsProvider>
+        </ThemeProvider>
+      </NotificationProvider>
+    </AuthProvider>
   );
 }

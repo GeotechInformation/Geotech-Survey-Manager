@@ -1,46 +1,24 @@
-// Survey Creator Page tsx
+// Home tsx
 
-"use client";
+import { getTokens } from "next-firebase-auth-edge";
+import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
+import { clientConfig, serverConfig } from "../config";
+import SurveyManagerPage from "./survey-manager/page";
 
-import { useEffect } from "react";
-import Header from "@/components/layout/Header";
-import { SurveyDataProvider, useSurveyDataContext } from "@/components/providers/SurveyDataProvider";
-import QuestionContainer from "@/components/survey/QuestionContainer";
-import Toolbar from "@/components/toolbar/Toolbar";
+export default async function Home() {
+  const tokens = await getTokens(cookies(), {
+    apiKey: clientConfig.apiKey,
+    cookieName: serverConfig.cookieName,
+    cookieSignatureKeys: serverConfig.cookieSignatureKeys,
+    serviceAccount: serverConfig.serviceAccount,
 
-function SurveyCreator() {
-  const { unsavedChanges } = useSurveyDataContext();
+    // UID in tokens.decodedToken.uid
+  });
 
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (unsavedChanges) {
-        event.preventDefault();
-        event.returnValue = ''; // This triggers the browser's confirmation dialog
-      }
-    };
+  if (!tokens) {
+    notFound();
+  }
 
-    // Attach the event listener
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    // Clean up the event listener on component unmount
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [unsavedChanges]);
-
-  return (
-    <div className="px-4 mb-8">
-      <Header />
-      <Toolbar />
-      <QuestionContainer />
-    </div>
-  );
-}
-
-export default function SurveyCreatorPage() {
-  return (
-    <SurveyDataProvider>
-      <SurveyCreator />
-    </SurveyDataProvider>
-  );
+  return <SurveyManagerPage />
 }

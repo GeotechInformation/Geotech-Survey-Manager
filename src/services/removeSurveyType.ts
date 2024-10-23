@@ -1,5 +1,5 @@
 import { collection, getDocs, updateDoc, doc, deleteField } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import { db } from "../firebaseConfig";
 
 /**
  * Remove surveyType field from all questions

@@ -1,13 +1,23 @@
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
-import { db } from "../../../firebaseConfig";
+import { collection, getDocs, deleteDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "../../firebaseConfig";
 import updateQuestionFrequency from "./updateQuestionFrequency";
+import getUserValue from "../utils/getUserValue";
 
 /**
  * Recursively delete all documents in a collection and update frequency in Master/Competitor collections.
  * @param collectionName - The path to the collection to be deleted
  */
-const deleteCollectionAndUpdateFrequency = async (collectionName: string) => {
+export default async function deleteCollectionInDB(collectionName: string) {
   try {
+
+    // Enforce authenticated user
+    if (!auth.currentUser) {
+      return { success: false, message: 'No user detected. Login to post' };
+    }
+
+    const userId = auth.currentUser.uid;
+    const userName = getUserValue(userId, "userName");
+
     // Get all documents in the collection
     const collectionRef = collection(db, collectionName);
     const snapshot = await getDocs(collectionRef);
@@ -31,10 +41,18 @@ const deleteCollectionAndUpdateFrequency = async (collectionName: string) => {
       await updateQuestionFrequency(docId, true, -1);  // Update frequency in #_CompetitorCollection
     }
 
+    // Update Document from Metadata with Deleted Information
+    const metadataDocRef = doc(db, "#_Metadata", collectionName);
+    await updateDoc(metadataDocRef, {
+      deleted: {
+        deletedByUserName: userName,
+        deletedByUserId: userId,
+        deletedAt: serverTimestamp(),
+      }
+    });
+
     console.log(`Successfully deleted collection: ${collectionName}`);
   } catch (error) {
     console.error(`Error deleting collection: ${collectionName}`, error);
   }
 };
-
-export default deleteCollectionAndUpdateFrequency;

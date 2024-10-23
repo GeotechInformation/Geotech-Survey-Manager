@@ -1,5 +1,5 @@
 import { collection, getDocs, setDoc, doc } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import { db } from "../firebaseConfig";
 
 /**
  * Extract Survey Type IDs from #_MasterCollection and save to Firestore

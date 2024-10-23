@@ -1,6 +1,6 @@
 import { OldQuestion, Question } from "@/types/Question";
 import { collection, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import { db } from "../firebaseConfig";
 
 /**
  * Migrate the question documents to the new structure

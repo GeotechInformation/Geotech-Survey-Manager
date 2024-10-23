@@ -1,5 +1,5 @@
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../../firebaseConfig";
+import { db } from "../../firebaseConfig";
 import { Status } from "@/types/Status";
 import { Question } from "@/types/Question";
 

@@ -1,6 +1,6 @@
 import { collection, getDocs, setDoc, doc } from "firebase/firestore";
 import { Question } from "@/types/Question";
-import { db } from "../../firebaseConfig";
+import { db } from "../firebaseConfig";
 
 /**
  * Migrate Questions from Old Collection to New Collection

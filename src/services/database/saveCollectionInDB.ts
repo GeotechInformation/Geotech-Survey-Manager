@@ -1,5 +1,5 @@
 import { collection, deleteDoc, doc, getDocs, setDoc } from "firebase/firestore";
-import { db } from "../../../firebaseConfig";
+import { db } from "../../firebaseConfig";
 import { CollectionMetadata } from "@/types/CollectionMetadata";
 import { Question } from "@/types/Question";
 

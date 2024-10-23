@@ -1,5 +1,5 @@
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../../firebaseConfig";
+import { db } from "../../firebaseConfig";
 
 /**
  * Fetch question IDs for a given survey type from #_SurveyTemplates collection

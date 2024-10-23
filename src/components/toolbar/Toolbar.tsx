@@ -15,6 +15,7 @@ import dynamic from "next/dynamic";
 import initializeFrequenciesFromSurveys from "@/services/database/initFreqFromSurveys";
 import { extractSurveyTypeIDs } from "@/services/extractSurveyType";
 import { removeSurveyTypeFromMasterCollection } from "@/services/removeSurveyType";
+import deleteCollectionInDB from "@/services/database/deleteCollectionInDB";
 
 type EditActionType = 'none' | 'interchange' | 'createQuestion' | 'editQuestion' | 'createComp';
 
@@ -82,6 +83,8 @@ const Toolbar = () => {
     // await extractSurveyTypeIDs();
 
     // await removeSurveyTypeFromMasterCollection();
+
+    // await deleteCollectionInDB("TEST");
   }
 
   return (

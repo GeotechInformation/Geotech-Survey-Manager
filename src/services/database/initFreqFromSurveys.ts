@@ -1,5 +1,5 @@
 import { getDocs, getDoc, updateDoc, doc, collection, increment } from "firebase/firestore";
-import { db } from "../../../firebaseConfig";
+import { db } from "../../firebaseConfig";
 
 /**
  * Initialize frequency for all questions in the master and competitor collections
