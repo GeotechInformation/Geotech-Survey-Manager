@@ -9,7 +9,7 @@ import { db } from "../../firebaseConfig";
  */
 export default async function getUserValue(uid: string, key: string): Promise<any> {
   try {
-    const userDocRef = doc(db, `USERS/${uid}`);
+    const userDocRef = doc(db, `##_USERS/${uid}`);
     const userDoc = await getDoc(userDocRef);
 
     if (userDoc.exists()) {

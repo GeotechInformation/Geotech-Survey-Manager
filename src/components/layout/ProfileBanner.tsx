@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { getAuth, signOut } from "firebase/auth";
 import { firebaseApp } from "@/firebaseConfig";
 import { useThemeContext } from "../providers/ThemeProvider";
+import Link from "next/link";
 
 interface ProfileBannerProps {
   uid: string;
@@ -82,9 +83,6 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({ uid, onClose }) => {
 
 
 
-
-
-
   return (
     <div ref={innerDivRef}>
 
@@ -99,6 +97,17 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({ uid, onClose }) => {
         </div>
       </div>
 
+      {userAdmin && (
+        <>
+          <div className="border-b border-hsl-l50 my-4"></div>
+
+          <Link href="/admin" className="cursor-pointer hover:bg-hsl-l90 hover:dark:bg-hsl-l20 px-2 py-1 my-4 flex items-center gap-2 rounded-md">
+            <IconGeneral type='bolt' className="fill-hsl-l30 dark:fill-hsl-l70" />
+            <p className="font-medium text-hsl-l30 dark:text-hsl-l70">Admin Console</p>
+          </Link>
+        </>
+      )}
+
       <div className="border-b border-hsl-l50 my-4"></div>
 
 
@@ -106,6 +115,8 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({ uid, onClose }) => {
         <IconGeneral type='dark-light-mode' className="fill-hsl-l30 dark:fill-hsl-l70" />
         <p className="font-medium text-hsl-l30 dark:text-hsl-l70">Toggle Darkmode</p>
       </div>
+
+
 
 
       <button type="button" onClick={handleLogout}

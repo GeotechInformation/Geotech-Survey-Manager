@@ -16,12 +16,18 @@ interface SurveyDataContextType {
   setCollectionMaster: React.Dispatch<React.SetStateAction<Question[] | null>>;
   collectionCompetitors: Question[] | null;
   setCollectionCompetitors: React.Dispatch<React.SetStateAction<Question[] | null>>;
+
   // Collection Metadata
   collectionMetadata: CollectionMetadata | null;
   setCollectionMetadata: React.Dispatch<React.SetStateAction<CollectionMetadata | null>>;
+
   // Unsaved Changes for tracking saved state
   unsavedChanges: boolean;
   setUnsavedChanges: React.Dispatch<React.SetStateAction<boolean>>;
+
+  // Search Query
+  searchQuery: string;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
 
   createTemplateSurvey: (surveyName: string, surveyType: string) => void;
   saveCollection: () => void;
@@ -48,6 +54,8 @@ export const SurveyDataProvider: React.FC<{ children: ReactNode }> = ({ children
   const [collectionCompetitors, setCollectionCompetitors] = useState<Question[] | null>(null);
   const [collectionMetadata, setCollectionMetadata] = useState<CollectionMetadata | null>(null);
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
 
   /**
    * Get Master Questions
@@ -190,7 +198,7 @@ export const SurveyDataProvider: React.FC<{ children: ReactNode }> = ({ children
     <SurveyDataContext.Provider
       value={{
         collection, setCollection, collectionMaster, setCollectionMaster, collectionCompetitors, setCollectionCompetitors,
-        collectionMetadata, setCollectionMetadata, unsavedChanges, setUnsavedChanges,
+        collectionMetadata, setCollectionMetadata, searchQuery, setSearchQuery, unsavedChanges, setUnsavedChanges,
         createTemplateSurvey, saveCollection, deleteAllData
       }}>
       {children}

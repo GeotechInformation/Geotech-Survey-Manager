@@ -60,14 +60,12 @@ const Header = () => {
   );
 
   return (
-    <header className="w-full py-4 px-8 flex flex-initial justify-between items-center">
+    <header className="w-full mt-2 py-4 px-8 flex flex-initial justify-between items-center">
       <Link href="/" className="w-[150px] max-h-[50px] relative">
         <img src="/geotech-info-services.png" alt="Geotech Logo" className="w-full h-full object-contain" />
       </Link>
 
-
-
-      <h1 className="font-montserrat font-bold text-2xl">{pageName}</h1>
+      <h1 className="font-montserrat font-semibold text-2xl">{pageName}</h1>
 
       <div className="flex gap-x-8 items-center">
         <Link href="/" className="font-medium text-xl hover:underline">Create</Link>

@@ -6,7 +6,7 @@ import { auth, db } from "../../firebaseConfig";
 
 /**
  * Register with Email
- * @param param firstName, email, password
+ * @param param userName, email, password
  * @returns true is successfull, throws error if not
  */
 export default async function registerWithEmail(userName: string, email: string, password: string): Promise<boolean | Error> {
@@ -36,7 +36,7 @@ export default async function registerWithEmail(userName: string, email: string,
 async function createEmailUserInDatabase(userId: string, userName: string, email: string) {
   try {
 
-    await setDoc(doc(db, `USERS/${userId}`), {
+    await setDoc(doc(db, `##_USERS/${userId}`), {
       uid: userId,
       userName: userName,
       email: email,

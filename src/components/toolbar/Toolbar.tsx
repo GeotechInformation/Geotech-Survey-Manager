@@ -12,6 +12,7 @@ import { generateExcelSurvey } from "@/services";
 import { AnimatePresence, motion } from "framer-motion";
 import ToolbarButton from "./ToolbarButton";
 import dynamic from "next/dynamic";
+
 import initializeFrequenciesFromSurveys from "@/services/database/initFreqFromSurveys";
 import { extractSurveyTypeIDs } from "@/services/extractSurveyType";
 import { removeSurveyTypeFromMasterCollection } from "@/services/removeSurveyType";
@@ -26,15 +27,18 @@ const DynEditQuestionModal = dynamic(() => import("../modals/EditCollectionQuest
 
 const Toolbar = () => {
   const { addNotification } = useNotification();
-  const { collection, collectionMetadata, saveCollection, unsavedChanges, deleteAllData } = useSurveyDataContext();
+  const { collection, collectionMetadata, searchQuery, setSearchQuery, saveCollection, unsavedChanges, deleteAllData } = useSurveyDataContext();
   const { geoColor, setGeoColor, QGridColumns, setQGridColumns } = useSettingsContext();
-  const [searchQuery, setSearchQuery] = useState<string>("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [selectedSurveyType, setSelectedSurveyType] = useState<string | null>(null);
   const [isSelectSurveyModalOpen, setIsSelectSurveyModalOpen] = useState<boolean>(false);
   const [editSurveyAction, setEditSurveyAction] = useState<EditActionType>('none');
 
 
+  /**
+   * Export To Excel
+   * @returns 
+   */
   const exportToExcel = () => {
     try {
       if (!collection || collection.length <= 0) {
@@ -55,18 +59,28 @@ const Toolbar = () => {
   }
 
 
-  // Open the modal with the selected survey type
+  /**
+   * Handle Create Survey
+   * @param type 
+   */
   const handleCreateSurvey = (type: string) => {
     setSelectedSurveyType(type);
     setIsCreateModalOpen(true);
   };
 
-  // Close Create Survey Name modal
+  /**
+   * Handle Create Survey Modal Close
+   */
   const handleCreateModalClose = () => {
     setIsCreateModalOpen(false);
     setSelectedSurveyType(null);
   };
 
+  /**
+   * Open Edit Survey Modal
+   * @param action 
+   * @returns 
+   */
   const openEditSurveyModal = (action: EditActionType) => {
     if (!collection) {
       addNotification("Create a new or load an existing survey to edit", "neutral");
@@ -84,11 +98,11 @@ const Toolbar = () => {
 
     // await removeSurveyTypeFromMasterCollection();
 
-    // await deleteCollectionInDB("TEST");
+    // await deleteCollectionInDB("Surevey_Training");
   }
 
   return (
-    <div className="w-full mt-4 px-4 py-1 flex justify-between items-center rounded-md shadow-sm bg-hsl-l100 dark:bg-hsl-l15 border border-hsl-l95 dark:border-none">
+    <div className="w-full px-4 py-1 flex justify-between items-center rounded-md shadow-sm bg-hsl-l100 dark:bg-hsl-l15 border border-hsl-l95 dark:border-none">
 
       {/* <button onClick={DO_STUFF}>DO_STUFF</button> */}
 

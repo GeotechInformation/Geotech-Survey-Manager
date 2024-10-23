@@ -10,7 +10,7 @@ import { db } from '../../firebaseConfig';
 export default async function checkUserExists(uid: string): Promise<boolean> {
 
   try {
-    const snapshot = await getDoc(doc(db, `USERS/${uid}`));
+    const snapshot = await getDoc(doc(db, `##_USERS/${uid}`));
     return snapshot.exists()
   } catch (error) {
     throw error;
