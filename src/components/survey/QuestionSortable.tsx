@@ -17,7 +17,7 @@ const QuestionSortable: React.FC<QuestionSortableProps> = ({ qd }) => {
   const { geoColor } = useSettingsContext();
   const { searchQuery } = useSurveyDataContext();
   const [isHighlighted, setIsHighlighted] = useState<boolean>(false);
-  const color = '#' + qd.color.slice(2);
+  const [color, setColor] = useState('#' + qd.color.slice(2));
 
   // useSortable hook from dnd-kit to enable dragging
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: qd.id });
@@ -37,6 +37,14 @@ const QuestionSortable: React.FC<QuestionSortableProps> = ({ qd }) => {
       setIsHighlighted(false);
     }
   }, [searchQuery]);
+
+  /**
+   * Update color when quesiton edited
+   */
+  useEffect(() => {
+    const color = '#' + qd.color.slice(2);
+    setColor(color)
+  }, [qd.color]);
 
 
   /**

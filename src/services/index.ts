@@ -13,9 +13,11 @@ export { default as getCollectionQuestions } from '@/services/database/getCollec
 export { default as checkSurveyNameExistsInB } from '@/services/database/checkSurveyNameExistsInDB';
 export { default as saveCollectionInDB } from '@/services/database/saveCollectionInDB';
 export { default as getExistingCollectionMetadata } from '@/services/database/getExistingCollectionMetadata';
-export { default as updateQuestionFrequency } from '@/services/database/updateQuestionFrequency';
-export { default as createQuestion } from '@/services/database/createQuestion';
 export { default as getQuestionIdsForSurveyType } from '@/services/database/getQuestionIdsForSurveyType';
+
+export { default as createQuestion } from '@/services/database/question/createQuestion';
+export { default as editQuestion } from '@/services/database/question/editQuestion';
+export { default as updateQuestionFrequency } from '@/services/database/question/updateQuestionFrequency';
 
 // Data Processing
 export { default as xlToCleanedDataframe } from '@/services/dataProcessing/xlToCleanedDataframe';

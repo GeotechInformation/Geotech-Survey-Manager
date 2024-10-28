@@ -1,6 +1,6 @@
 import { collection, getDocs, deleteDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../../firebaseConfig";
-import updateQuestionFrequency from "./updateQuestionFrequency";
+import updateQuestionFrequency from "./question/updateQuestionFrequency";
 import getUserValue from "../utils/getUserValue";
 
 /**

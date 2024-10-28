@@ -3,9 +3,12 @@
 "use client";
 
 import IconGeneral from "@/components/icons/IconGeneral";
+import { useNotification } from "@/components/providers/NotificationProvider";
+import { useSettingsContext } from "@/components/providers/SettingsProvider";
 import { useSurveyDataContext } from "@/components/providers/SurveyDataProvider";
+import { editQuestion } from "@/services";
 import { Question } from "@/types/Question";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const initQuestionData: Question = {
   id: "",
@@ -21,9 +24,11 @@ const initQuestionData: Question = {
 const geotechColors = ["FFFFFFCC", "FFCCFFCC", "FFFABF8F", "FFFFCCCC", "FFE4DFEC", "FFCCFFFF", "FFFFFFFF"];
 const geotechColorsTailwind = ["bg-[#FFFFCC]", "bg-[#CCFFCC]", "bg-[#FABF8F]", "bg-[#FFCCCC]", "bg-[#E4DFEC]", "bg-[#CCFFFF]", "bg-[#FFFFFF]"];
 
+
 const EditQuestions = () => {
-  const { collection } = useSurveyDataContext();
-  const [question, setQuestion] = useState<Question>(initQuestionData)
+  const { addNotification } = useNotification();
+  const { collection, setCollection, collectionMetadata, searchQuery } = useSurveyDataContext();
+  const [question, setQuestion] = useState<Question>(initQuestionData);
 
   /**
    * Handle Input Change
@@ -50,8 +55,66 @@ const EditQuestions = () => {
     }
   };
 
-  const updateQuestion = () => {
 
+  const updateQuestion = async () => {
+    if (!collection || !collectionMetadata) {
+      addNotification("A survey must be loaded to edit existing questions", "error");
+      return;
+    }
+
+    const validId = question.id.trim();
+    const validQuestion = question.question.trim();
+    const validComment = question.comment.trim();
+
+    if (validId.length <= 0 || validQuestion.length <= 0) {
+      addNotification("ID and Question fields cannot be empty", "error");
+      return;
+    }
+
+    // Ensure the ID is unique, unless it's the same ID of the question being edited
+    const isDuplicateId = collection?.some((q) => q.id === validId && q.id !== question.id);
+    if (isDuplicateId) {
+      addNotification("ID already exists", "error");
+      return;
+    }
+
+    // Clean up the options string (if present) by trimming and removing empty values
+    const cleanedOptions = question.validBounds.options
+      .split(';') // Split by delimiter
+      .map(option => option.trim()) // Trim white spaces
+      .filter(option => option.length > 0) // Remove empty options
+      .join(';'); // Join back with semicolons
+
+    const cleanedMin = question.responseType === 'MinMax' ? question.validBounds.min : question.responseType === 'YesNo' ? 0 : 0;
+    const cleanedMax = question.responseType === 'MinMax' ? question.validBounds.min : question.responseType === 'YesNo' ? 1 : 0;
+
+    if (cleanedMin > cleanedMax) {
+      addNotification("Max cannot be greater than Min", "error");
+      return;
+    }
+
+    try {
+      await editQuestion(collectionMetadata.name, {
+        ...question,
+        id: validId,
+        question: validQuestion,
+        comment: validComment,
+        validBounds: {
+          ...question.validBounds,
+          min: cleanedMin,
+          max: cleanedMax,
+          options: question.responseType === "List" ? cleanedOptions : ""
+        }
+      });
+
+      const updatedCollection = collection.map(q => q.id === question.id ? { ...question, id: validId, question: validQuestion, comment: validComment } : q);
+      setCollection(updatedCollection);
+
+      addNotification("Question updated successfully", "success");
+    } catch (error) {
+      console.error("Error creating question: ", error);
+      addNotification("An error occurred while updating the question", "error");
+    }
   }
 
   return (
@@ -61,12 +124,25 @@ const EditQuestions = () => {
 
       <div className="grid grid-cols-2 h-full gap-x-8">
 
-        <div className="flex-grow flex-shrink-0 h-full overflow-y-auto hidden-scrollbar">
-          {collection?.map((q, idx) => (
-            <div key={idx} onClick={() => setQuestion(q)}
-              className="my-2 px-2 py-1 rounded-lg cursor-pointer"
-              style={{ backgroundColor: "#" + q.color.slice(2) }}>{q.question}</div>
-          ))}
+        {/* Render Questions List */}
+        <div className="flex-grow flex-shrink-0 h-full overflow-y-auto hidden-scrollbar px-2">
+          {collection?.map((q, idx) => {
+            // Determine if the question should be highlighted
+            const isHighlighted = searchQuery && searchQuery.trim().length > 0
+              ? q.question.toLowerCase().includes(searchQuery.toLowerCase())
+              : false;
+
+            return (
+              <div key={idx}
+                onClick={() => setQuestion(q)}
+                style={{ backgroundColor: '#' + q.color.slice(2) }}
+                className={`my-2 px-2 py-1 rounded-lg cursor-pointer
+                  ${searchQuery && searchQuery.trim().length > 0 ? (isHighlighted ? 'ring-1 ring-g-orange' : 'opacity-50') : ''}`}
+              >
+                {q.question}
+              </div>
+            );
+          })}
         </div>
 
         <div className="flex flex-col px-6 py-4 rounded-md shadow-sm bg-hsl-l100 dark:bg-hsl-l15 border border-hsl-l95 dark:border-none">
@@ -74,8 +150,8 @@ const EditQuestions = () => {
           <div className="flex flex-col">
             <label htmlFor="id" className="text-sm mb-2 text-hsl-l50">ID</label>
             <input type="text" id="id" name="id" autoComplete="off"
-              className='df-input'
-              value={question?.id} onChange={handleInputChange} />
+              className='df-input text-hsl-l50'
+              value={question?.id} onChange={handleInputChange} disabled />
 
             {/* QUESTION */}
             <label htmlFor="question" className="text-sm mt-6 mb-2 text-hsl-l50">Question</label>

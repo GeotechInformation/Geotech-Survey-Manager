@@ -17,9 +17,15 @@ const QuestionDefault: React.FC<QuestionDefaultProps> = ({ qd, inCollection, onT
   const { geoColor } = useSettingsContext();
   const { searchQuery } = useSurveyDataContext();
   const [isHighlighted, setIsHighlighted] = useState<boolean>(false);
+  const [color, setColor] = useState('#' + qd.color.slice(2));
 
-  // Memoize the color calculation
-  const color = useMemo(() => '#' + qd.color.slice(2), [qd.color]);
+  /**
+   * Update color when quesiton edited
+   */
+  useEffect(() => {
+    const color = '#' + qd.color.slice(2);
+    setColor(color);
+  }, [qd.color]);
 
   /**
    * Memoize Opacity

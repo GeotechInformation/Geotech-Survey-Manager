@@ -57,27 +57,22 @@ const CreateQuestion = () => {
    * @returns 
    */
   const createCustomQuestion = async () => {
-    const validId = question.id.trim();
-    const validQuestion = question.question.trim();
-    const validComment = question.comment.trim();
-
-    if (validId.length <= 0 || validQuestion.length <= 0) {
-      addNotification("Fields cannot be empty", "error");
-      return;
-    }
-
-    if (collectionMaster?.some((q) => q.id === question.id) || collectionCompetitors?.some((q) => q.id === question.id)) {
-      addNotification("ID already exists", "error");
-      return;
-    }
-
     if (!collectionMetadata || !collection) {
       addNotification("No Survey is Loaded", "error");
       return;
     }
 
-    if (question.validBounds.min > question.validBounds.max) {
-      addNotification("Max cannot be greater than Min", "error");
+    const validId = question.id.trim();
+    const validQuestion = question.question.trim();
+    const validComment = question.comment.trim();
+
+    if (validId.length <= 0 || validQuestion.length <= 0) {
+      addNotification("ID and Question fields cannot be empty", "error");
+      return;
+    }
+
+    if (collectionMaster?.some((q) => q.id === question.id) || collectionCompetitors?.some((q) => q.id === question.id)) {
+      addNotification("ID already exists", "error");
       return;
     }
 
