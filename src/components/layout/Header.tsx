@@ -5,19 +5,15 @@
 import ReactDOM from 'react-dom';
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
-import { useThemeContext } from "../providers/ThemeProvider";
 import IconGeneral from "../icons/IconGeneral";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "../providers/AuthProvider";
 
-const DynamicProfileBanner = dynamic(() => import('./ProfileBanner'), {
-  loading: () => <></>,
-})
+const DynamicProfileBanner = dynamic(() => import('./ProfileBanner'), { loading: () => <></>, })
 
 const Header = () => {
-  const { toggleTheme } = useThemeContext();
   const pathname = usePathname();
   const pageName = pathname === '/' ? 'Survey Creator' : pathname === 'editor' ? 'Survey Editor' : 'Analysis';
 
@@ -69,7 +65,6 @@ const Header = () => {
 
       <div className="flex gap-x-8 items-center">
         <Link href="/" className="font-medium text-xl hover:underline">Create</Link>
-        <Link href="/editor" className="font-medium text-xl hover:underline">Edit</Link>
         <Link href="/prelim-analysis" className="font-medium text-xl hover:underline">Analysis</Link>
 
         {loading ? null : (

@@ -106,7 +106,7 @@ const CreateQuestion = () => {
       });
 
       setCollection((prevCollection) => (prevCollection ? [...prevCollection, question] : null));
-
+      setUnsavedChanges(true);
       addNotification("Question Added", "success");
       setQuestion(initQuestionData);
     } catch (error) {

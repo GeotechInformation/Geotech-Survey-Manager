@@ -26,7 +26,6 @@ const CreateCompetitor = () => {
   const { collection, collectionCompetitors, setCollection, setCollectionCompetitors, setUnsavedChanges } = useSurveyDataContext();
   const { addNotification } = useNotification();
   const [competitors, setCompetitors] = useState<Competitor[]>([blankCompetitor]);
-  const [searchQuery, setSearchQuery] = useState<string>('');
   const [sort, setSort] = useState<boolean>(true);
 
   // Add a new blank competitor
@@ -83,58 +82,53 @@ const CreateCompetitor = () => {
         }
 
         // Add competitor questions based on selected fields
-        if (comp.inSightOr250) {
-          allCompQuestionObjects.push({ id: `CiSight-250m-${comp.name}`, question: `${comp.name} in Sight or 250m` });
-        }
-        if (comp.inSight) {
-          allCompQuestionObjects.push({ id: `CiSight-${comp.name}`, question: `${comp.name} in Sight` });
-        }
-        if (comp.inCentre) {
-          allCompQuestionObjects.push({ id: `CiCentre-${comp.name}`, question: `${comp.name} in Centre` });
-        }
-        if (comp.in250) {
-          allCompQuestionObjects.push({ id: `Ci250m-${comp.name}`, question: `${comp.name} in 250m` });
-        }
-        if (comp.in500) {
-          allCompQuestionObjects.push({ id: `Ci500m-${comp.name}`, question: `${comp.name} in 500m` });
-        }
-        if (comp.custom.trim().length > 0) {
-          allCompQuestionObjects.push({ id: `CiDist-${comp.name}`, question: `${comp.name} in ${comp.custom}` });
+        if (comp.inSightOr250) allCompQuestionObjects.push({ id: `CiSight-250m-${comp.name}`, question: `${comp.name} in Sight or 250m` });
+        if (comp.inSight) allCompQuestionObjects.push({ id: `CiSight-${comp.name}`, question: `${comp.name} in Sight` });
+        if (comp.inCentre) allCompQuestionObjects.push({ id: `CiCentre-${comp.name}`, question: `${comp.name} in Centre` });
+        if (comp.in250) allCompQuestionObjects.push({ id: `Ci250m-${comp.name}`, question: `${comp.name} in 250m` });
+        if (comp.in500) allCompQuestionObjects.push({ id: `Ci500m-${comp.name}`, question: `${comp.name} in 500m` });
+        if (comp.custom.trim().length > 0) allCompQuestionObjects.push({ id: `CiDist-${comp.name}`, question: `${comp.name} in ${comp.custom}` });
+      }
+
+      // Check for duplicates in collectionCompetitors
+      for (const comp of allCompQuestionObjects) {
+        if (collectionCompetitors.some(q => q.id === comp.id)) {
+          addNotification(`Competitor ${comp.question} already exists`, "error");
+          return;
         }
       }
 
-      // Now, add all competitor questions to the database
-      for (const compQuestion of allCompQuestionObjects) {
-        const question: Question = {
-          id: compQuestion.id,
-          index: 999,
-          question: compQuestion.question,
-          category: "Competitor",
-          color: "default",
-          comment: "Competitor data",
-          responseType: "custom",
-          validBounds: { min: 0, max: 1, options: "" },
-        };
+      // Create Question Object
+      const newQuestions = allCompQuestionObjects.map((compQuestion) => ({
+        id: compQuestion.id,
+        index: 999,
+        question: compQuestion.question,
+        category: "Competition",
+        color: "FFFFCCCC",
+        comment: "",
+        responseType: "YesNo",
+        validBounds: { min: 0, max: 1, options: "" },
+      }));
 
-        await createQuestion("competitors", question);
+      // Determine the insert position in collection
+      const comIndex = collection.findIndex((q) => q.id.startsWith("COM"));
+      const insertIndex = comIndex === -1 ? collection.length : comIndex;
 
-        // Insert competitor before the first "COM" question
-        const comIndex = collection.findIndex((q) => q.id.startsWith("COM"));
-        const insertIndex = comIndex === -1 ? collection.length : comIndex;
+      // Insert all new questions at the determined position
+      const updatedCollection = [
+        ...collection.slice(0, insertIndex),
+        ...newQuestions,
+        ...collection.slice(insertIndex),
+      ];
 
-        // Update collection by inserting at the correct position
-        const updatedCollection = [
-          ...collection.slice(0, insertIndex),
-          question,
-          ...collection.slice(insertIndex),
-        ];
+      // Update the collection and collectionCompetitors
+      setUnsavedChanges(true);
+      setCollection(updatedCollection);
+      setCollectionCompetitors((prevCompetitors) => prevCompetitors ? [...prevCompetitors, ...newQuestions] : newQuestions);
 
-        setCollection(updatedCollection);
-
-        // Update collectionCompetitors as well
-        setCollectionCompetitors((prevCompetitors) =>
-          prevCompetitors ? [...prevCompetitors, question] : [question]
-        );
+      // Send each question to the database
+      for (const question of newQuestions) {
+        await createQuestion("#_CompetitorCollection", question);
       }
 
       addNotification("Competitors successfully added to the database", "success");

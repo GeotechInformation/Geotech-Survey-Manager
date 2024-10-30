@@ -1,5 +1,6 @@
 import ExcelJS, { DataValidationOperator, Workbook, Worksheet, } from 'exceljs';
 import { Question } from '@/types/Question';
+import { CollectionMetadata } from '@/types/CollectionMetadata';
 
 type SiteDataRow = {
   [columnNumber: number]: string | number | null;
@@ -19,7 +20,7 @@ interface CommentText {
  * @param {Question} questions 
  * @param {SiteDataRow} siteData 
  */
-export default function generateExcelSurvey(questions: Question[], siteData: SiteDataRow[] | null = null) {
+export default function generateExcelSurvey(questions: Question[], metadata: CollectionMetadata, siteData: SiteDataRow[] | null = null) {
   // Set Up Constants for Indexing
   const surveyerInputRow = 3; // Where to begin input for sites
   let surveySiteNumber = Array.isArray(siteData) && siteData.length > 0 ? siteData.length + 5 : 50
@@ -35,7 +36,7 @@ export default function generateExcelSurvey(questions: Question[], siteData: Sit
     insertQuestionComment(questions, worksheet);
     if (siteData) { addSiteData(siteData, worksheet) };
     applyStyling(questions, worksheet);
-    generateExcelFile(workbook);
+    generateExcelFile(workbook, metadata.name);
   } catch (error) {
     throw error;
   }
@@ -400,7 +401,7 @@ function applyStyling(questions: Question[], worksheet: Worksheet) {
  * Generate Excel File
  * @param {*} workbook 
  */
-function generateExcelFile(workbook: Workbook) {
+function generateExcelFile(workbook: Workbook, surveyName: string) {
   try {
     // Generate a blob from the workbook
     workbook.xlsx.writeBuffer().then((buffer) => {
@@ -410,7 +411,7 @@ function generateExcelFile(workbook: Workbook) {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'Survey.xlsx';
+      a.download = `Survey_${surveyName}.xlsx`;
       a.click();
       // Clean up resources
       window.URL.revokeObjectURL(url);

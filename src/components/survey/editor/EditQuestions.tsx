@@ -4,11 +4,10 @@
 
 import IconGeneral from "@/components/icons/IconGeneral";
 import { useNotification } from "@/components/providers/NotificationProvider";
-import { useSettingsContext } from "@/components/providers/SettingsProvider";
 import { useSurveyDataContext } from "@/components/providers/SurveyDataProvider";
 import { editQuestion } from "@/services";
 import { Question } from "@/types/Question";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 
 const initQuestionData: Question = {
   id: "",
@@ -27,7 +26,7 @@ const geotechColorsTailwind = ["bg-[#FFFFCC]", "bg-[#CCFFCC]", "bg-[#FABF8F]", "
 
 const EditQuestions = () => {
   const { addNotification } = useNotification();
-  const { collection, setCollection, collectionMetadata, searchQuery } = useSurveyDataContext();
+  const { collection, setCollection, collectionMetadata, searchQuery, setUnsavedChanges } = useSurveyDataContext();
   const [question, setQuestion] = useState<Question>(initQuestionData);
 
   /**
@@ -109,7 +108,7 @@ const EditQuestions = () => {
 
       const updatedCollection = collection.map(q => q.id === question.id ? { ...question, id: validId, question: validQuestion, comment: validComment } : q);
       setCollection(updatedCollection);
-
+      setUnsavedChanges(true);
       addNotification("Question updated successfully", "success");
     } catch (error) {
       console.error("Error creating question: ", error);

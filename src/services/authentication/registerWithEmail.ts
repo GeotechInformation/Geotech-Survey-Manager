@@ -36,7 +36,7 @@ export default async function registerWithEmail(userName: string, email: string,
 async function createEmailUserInDatabase(userId: string, userName: string, email: string) {
   try {
 
-    await setDoc(doc(db, `##_USERS/${userId}`), {
+    await setDoc(doc(db, `AAA_USERS/${userId}`), {
       uid: userId,
       userName: userName,
       email: email,
