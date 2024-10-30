@@ -19,6 +19,9 @@ export { default as createQuestion } from '@/services/database/question/createQu
 export { default as editQuestion } from '@/services/database/question/editQuestion';
 export { default as updateQuestionFrequency } from '@/services/database/question/updateQuestionFrequency';
 
+// Database / Admin
+export { default as renameCollectionInDB } from '@/services/database/admin/renameCollectionInDB';
+
 // Data Processing
 export { default as xlToCleanedDataframe } from '@/services/dataProcessing/xlToCleanedDataframe';
 export { default as fillNaSurveyColumns } from '@/services/dataProcessing/fillNaSurveyColumns';

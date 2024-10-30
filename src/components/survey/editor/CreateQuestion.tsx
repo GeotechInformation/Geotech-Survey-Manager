@@ -23,7 +23,7 @@ const CreateQuestion = () => {
   const { collectionMaster, collectionCompetitors, collectionMetadata, collection, setCollection, setUnsavedChanges } = useSurveyDataContext();
   const { addNotification } = useNotification();
   const [question, setQuestion] = useState<Question>(initQuestionData);
-  const [isPreview, setIsPreview] = useState<boolean>(false);
+  const [isPreview, setIsPreview] = useState<boolean>(true);
   const geotechColors = ["FFFFFFCC", "FFCCFFCC", "FFFABF8F", "FFFFCCCC", "FFE4DFEC", "FFCCFFFF", "FFFFFFFF"];
   const geotechColorsTailwind = ["bg-[#FFFFCC]", "bg-[#CCFFCC]", "bg-[#FABF8F]", "bg-[#FFCCCC]", "bg-[#E4DFEC]", "bg-[#CCFFFF]", "bg-[#FFFFFF]"];
 

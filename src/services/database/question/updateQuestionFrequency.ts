@@ -9,7 +9,7 @@ import { db } from "../../../firebaseConfig";
  */
 export default async function updateQuestionFrequency(questionId: string, isCompetitor: boolean = false, change: number) {
   try {
-    const collectionName = isCompetitor ? "#_CompetitorCollection" : "#_MasterCollection";
+    const collectionName = isCompetitor ? "AAA_CompetitorCollection" : "AAA_MasterCollection";
     const questionDocRef = doc(db, collectionName, questionId);
 
     // Check if the document exists before updating

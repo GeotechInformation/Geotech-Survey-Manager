@@ -100,7 +100,7 @@ const EditCollectionQuestions: React.FC<EditCollectionQuestionsProps> = ({ actio
           >
             {curAction === 'interchange' && <DynInterchangeQuestions />}
             {curAction === 'createQuestion' && <DynCreateQuestion />}
-            {curAction === 'editQuestion' && (<DynEditQuestions />)}
+            {curAction === 'editQuestion' && <DynEditQuestions />}
             {curAction === 'createComp' && <DynCreateCompetitor />}
           </motion.div>
         </AnimatePresence>

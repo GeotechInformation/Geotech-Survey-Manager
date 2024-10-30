@@ -45,8 +45,8 @@ export default async function deleteCollectionInDB(collectionName: string) {
     const metadataDocRef = doc(db, "#_Metadata", collectionName);
     await updateDoc(metadataDocRef, {
       deleted: {
-        deletedByUserName: userName,
-        deletedByUserId: userId,
+        userName,
+        userId,
         deletedAt: serverTimestamp(),
       }
     });

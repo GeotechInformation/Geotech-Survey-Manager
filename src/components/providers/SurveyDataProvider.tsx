@@ -66,7 +66,7 @@ export const SurveyDataProvider: React.FC<{ children: ReactNode }> = ({ children
     if (!addNotification) return;
     const getMasterQuestions = async () => {
       try {
-        const response = await getCollectionQuestions('#_MasterCollection');
+        const response = await getCollectionQuestions('AAA_MasterCollection');
         if ('success' in response) {
           if (!response.success) {
             addNotification(response.message!, 'error');
@@ -92,7 +92,7 @@ export const SurveyDataProvider: React.FC<{ children: ReactNode }> = ({ children
     if (!addNotification) return;
     const getCompetitorQuestions = async () => {
       try {
-        const response = await getCollectionQuestions('#_CompetitorCollection');
+        const response = await getCollectionQuestions('AAA_CompetitorCollection');
         if ('success' in response) {
           if (!response.success) {
             addNotification(response.message!, 'error');

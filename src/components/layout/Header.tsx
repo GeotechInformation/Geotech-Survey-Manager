@@ -13,9 +13,15 @@ import { useAuth } from "../providers/AuthProvider";
 
 const DynamicProfileBanner = dynamic(() => import('./ProfileBanner'), { loading: () => <></>, })
 
+const pageNames: { [key: string]: string } = {
+  '/': 'Survey Creator',
+  '/prelim-analysis': 'Analysis',
+  '/admin': 'Admin Console'
+};
+
 const Header = () => {
   const pathname = usePathname();
-  const pageName = pathname === '/' ? 'Survey Creator' : pathname === 'editor' ? 'Survey Editor' : 'Analysis';
+  const pageName = pageNames[pathname] || 'Unkown page?';
 
   const { user, loading } = useAuth();
   const [isProfileBannerVisible, setIsProfileBannerVisible] = useState<boolean>(false);

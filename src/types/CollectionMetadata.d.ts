@@ -15,4 +15,9 @@ export interface CollectionMetadata {
     userId: string;
     userName: string;
   };
+  deleted?: {
+    deletedAt: Timestamp,
+    userId: string;
+    userName: string;
+  }
 }

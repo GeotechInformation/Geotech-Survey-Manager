@@ -12,7 +12,7 @@ import AnalyseButton from "@/components/analysis/AnalyseButton";
 import DownloadButton from "@/components/analysis/DownloadButton";
 import Preview from "@/components/analysis/Preview";
 
-import renameCollection from "@/services/renameCollection";
+import renameCollection from "@/services/database/admin/renameCollectionInDB";
 import migrateQuestions from "@/services/migrateQuestion";
 
 function PrelimAnalysis() {
