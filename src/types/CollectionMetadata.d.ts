@@ -5,6 +5,14 @@ import { Timestamp } from "firebase/firestore";
  */
 export interface CollectionMetadata {
   name: string;
-  createdAt: Timestamp;
-  lastSaved: Timestamp;
+  createdAt: {
+    time: Timestamp,
+    userId: string;
+    userName: string;
+  };
+  lastSaved: {
+    time: Timestamp
+    userId: string;
+    userName: string;
+  };
 }

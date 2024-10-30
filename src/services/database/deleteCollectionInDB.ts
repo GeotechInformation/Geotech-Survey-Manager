@@ -16,7 +16,7 @@ export default async function deleteCollectionInDB(collectionName: string) {
     }
 
     const userId = auth.currentUser.uid;
-    const userName = getUserValue(userId, "userName");
+    const userName = await getUserValue(userId, "userName");
 
     // Get all documents in the collection
     const collectionRef = collection(db, collectionName);

@@ -5,9 +5,10 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { useNotification } from './NotificationProvider';
-import { getCollectionQuestions, getQuestionIdsForSurveyType, saveCollectionInDB, updateQuestionFrequency } from '@/services';
+import { getCollectionQuestions, getQuestionIdsForSurveyType, getUserValue, saveCollectionInDB, updateQuestionFrequency } from '@/services';
 import { Question } from '@/types/Question';
 import { CollectionMetadata } from '@/types/CollectionMetadata';
+import { useAuth } from './AuthProvider';
 
 interface SurveyDataContextType {
   collection: Question[] | null;
@@ -49,6 +50,7 @@ export const useSurveyDataContext = (): SurveyDataContextType => {
 // Create a provider component
 export const SurveyDataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { addNotification } = useNotification();
+  const { user, loading } = useAuth();
   const [collection, setCollection] = useState<Question[] | null>(null);
   const [collectionMaster, setCollectionMaster] = useState<Question[] | null>(null);
   const [collectionCompetitors, setCollectionCompetitors] = useState<Question[] | null>(null);
@@ -128,10 +130,25 @@ export const SurveyDataProvider: React.FC<{ children: ReactNode }> = ({ children
       return;
     }
 
+    if (!user) {
+      addNotification("User Credentials are not authenticated / Synced", "error");
+      return;
+    }
+
+    const userName = await getUserValue(user.uid, "userName");
+
     const metadata: CollectionMetadata = {
       name: surveyName,
-      createdAt: Timestamp.now(),
-      lastSaved: Timestamp.now()
+      createdAt: {
+        time: Timestamp.now(),
+        userId: user.uid,
+        userName: userName
+      },
+      lastSaved: {
+        time: Timestamp.now(),
+        userId: user.uid,
+        userName: userName
+      },
     }
 
     setCollectionMetadata(metadata);
@@ -177,7 +194,11 @@ export const SurveyDataProvider: React.FC<{ children: ReactNode }> = ({ children
     addNotification('Saving...', 'neutral');
 
     try {
-      await saveCollectionInDB(collection, collectionMetadata);
+      const status = await saveCollectionInDB(collection, collectionMetadata);
+      if (!status.success) {
+        addNotification(status.message!, "error");
+        return;
+      }
       setUnsavedChanges(false);
       addNotification('Saved Successfully', 'success');
     } catch (error) {
