@@ -7,7 +7,7 @@ import { useSurveyDataContext } from "../providers/SurveyDataProvider";
 import ToolbarButton from "./ToolbarButton";
 
 
-type ActionType = 'none' | 'rename';
+type ActionType = 'none' | 'rename' | 'load';
 
 
 interface ToolbarAdminConsole {
@@ -26,6 +26,7 @@ const ToolbarAdminConsole: React.FC<ToolbarAdminConsole> = ({ setCurAction }) =>
           <p className="group-hover:bg-hsl-l95 group-hover:dark:bg-hsl-l20 py-1 px-4 rounded-md font-medium">Survey</p>
           <div className="group-hover:flex flex-col z-50 w-max hidden absolute top-full bg-hsl-l100 dark:bg-hsl-l20 rounded-md shadow-md border border-hsl-l90 dark:border-hsl-l25">
             <ToolbarButton label="Rename Survey" icon="edit-question" fnc={() => { setCurAction('rename') }} />
+            <ToolbarButton label="Load Master" icon="download" fnc={() => { setCurAction('load') }} />
           </div>
         </div>
 

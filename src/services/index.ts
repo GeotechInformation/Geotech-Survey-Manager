@@ -35,3 +35,5 @@ export { default as buildMetadata } from '@/services/dataProcessing/buildMetadat
 export { default as generateExcelAIO } from '@/services/utils/generateExcelAIO';
 export { default as generateExcelSurvey } from '@/services/utils/generateExcelSurvey';
 export { default as getUserValue } from '@/services/utils/getUserValue';
+export { default as exportMasterToExcel } from '@/services/utils/exportMasterToExcel';
+export { default as uploadExcelToMaster } from '@/services/utils/uploadExcelToMaster';

@@ -88,25 +88,24 @@ function handleDataValidation(questions: Question[], worksheet: Worksheet, start
           type = 'whole';
           operator = 'between';
           promptTitle = 'Yes / No';
-          prompt = '[1 / 0]'
+          prompt = '[1 / 0]';
         }
 
-        if (question.responseType === '#') {
+        if (question.responseType === 'Number') {
           type = 'decimal';
           operator = 'between';
           promptTitle = 'Enter:';
           prompt = 'Any Number';
         }
 
-        if (question.responseType === '0 to 3' || question.responseType === '1 to 3' || question.responseType === '1 to 5') {
+        if (question.responseType === 'MinMax') {
           type = 'whole';
           operator = 'between';
           promptTitle = 'Enter:';
           prompt = '[' + question.validBounds.min + ' to ' + question.validBounds.max + ']';
         }
 
-        if (question.responseType === 'YesNo' || question.responseType === '#' || question.responseType === '0 to 3'
-          || question.responseType === '1 to 3' || question.responseType === '1 to 5') {
+        if (question.responseType === 'YesNo' || question.responseType === 'MinMax') {
           worksheet.getCell(i, index + 1).dataValidation = {
             type: type,
             operator: operator,
