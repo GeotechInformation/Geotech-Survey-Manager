@@ -1,10 +1,8 @@
 import ExcelJS, { DataValidationOperator, Workbook, Worksheet, } from 'exceljs';
 import { Question } from '@/types/Question';
 import { CollectionMetadata } from '@/types/CollectionMetadata';
+import { SiteData } from '@/types/SiteData';
 
-type SiteDataRow = {
-  [columnNumber: number]: string | number | null;
-};
 
 interface CommentText {
   font?: {
@@ -20,7 +18,7 @@ interface CommentText {
  * @param {Question} questions 
  * @param {SiteDataRow} siteData 
  */
-export default function generateExcelSurvey(questions: Question[], metadata: CollectionMetadata, siteData: SiteDataRow[] | null = null) {
+export default function generateExcelSurvey(questions: Question[], metadata: CollectionMetadata, siteData: SiteData | null = null) {
   // Set Up Constants for Indexing
   const surveyerInputRow = 3; // Where to begin input for sites
   let surveySiteNumber = Array.isArray(siteData) && siteData.length > 0 ? siteData.length + 5 : 50
@@ -246,7 +244,7 @@ function insertQuestionComment(questions: Question[], worksheet: Worksheet): voi
  * @param {*} questions 
  * @param {*} worksheet 
  */
-function addSiteData(siteData: SiteDataRow[], worksheet: Worksheet): void {
+function addSiteData(siteData: SiteData, worksheet: Worksheet): void {
   try {
     if (Array.isArray(siteData) && siteData.length > 0) {
       // Find Index of Columns based on Mapping Headers

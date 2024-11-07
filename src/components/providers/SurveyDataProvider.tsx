@@ -9,6 +9,7 @@ import { getCollectionQuestions, getQuestionIdsForSurveyType, getUserValue, save
 import { Question } from '@/types/Question';
 import { CollectionMetadata } from '@/types/CollectionMetadata';
 import { useAuth } from './AuthProvider';
+import { SiteData } from '@/types/SiteData';
 
 interface SurveyDataContextType {
   collection: Question[] | null;
@@ -21,6 +22,10 @@ interface SurveyDataContextType {
   // Collection Metadata
   collectionMetadata: CollectionMetadata | null;
   setCollectionMetadata: React.Dispatch<React.SetStateAction<CollectionMetadata | null>>;
+
+  // Site Data for Export
+  siteData: SiteData | null;
+  setSiteData: React.Dispatch<React.SetStateAction<SiteData | null>>;
 
   // Unsaved Changes for tracking saved state
   unsavedChanges: boolean;
@@ -55,6 +60,7 @@ export const SurveyDataProvider: React.FC<{ children: ReactNode }> = ({ children
   const [collectionMaster, setCollectionMaster] = useState<Question[] | null>(null);
   const [collectionCompetitors, setCollectionCompetitors] = useState<Question[] | null>(null);
   const [collectionMetadata, setCollectionMetadata] = useState<CollectionMetadata | null>(null);
+  const [siteData, setSiteData] = useState<SiteData | null>(null);
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -219,7 +225,7 @@ export const SurveyDataProvider: React.FC<{ children: ReactNode }> = ({ children
     <SurveyDataContext.Provider
       value={{
         collection, setCollection, collectionMaster, setCollectionMaster, collectionCompetitors, setCollectionCompetitors,
-        collectionMetadata, setCollectionMetadata, searchQuery, setSearchQuery, unsavedChanges, setUnsavedChanges,
+        collectionMetadata, setCollectionMetadata, siteData, setSiteData, searchQuery, setSearchQuery, unsavedChanges, setUnsavedChanges,
         createTemplateSurvey, saveCollection, deleteAllData
       }}>
       {children}

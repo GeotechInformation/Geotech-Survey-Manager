@@ -12,11 +12,13 @@ import { generateExcelSurvey } from "@/services";
 import { AnimatePresence, motion } from "framer-motion";
 import ToolbarButton from "./ToolbarButton";
 import dynamic from "next/dynamic";
+import ExcelJS from "exceljs";
 
 import initializeFrequenciesFromSurveys from "@/services/database/initFreqFromSurveys";
 import { extractSurveyTypeIDs } from "@/services/extractSurveyType";
 import { removeSurveyTypeFromMasterCollection } from "@/services/removeSurveyType";
 import deleteCollectionInDB from "@/services/database/deleteCollectionInDB";
+import { SiteData } from "@/types/SiteData";
 
 type EditActionType = 'none' | 'interchange' | 'createQuestion' | 'editQuestion' | 'createComp';
 
@@ -27,7 +29,7 @@ const DynEditQuestionModal = dynamic(() => import("../modals/EditCollectionQuest
 
 const Toolbar = () => {
   const { addNotification } = useNotification();
-  const { collection, collectionMetadata, searchQuery, setSearchQuery, saveCollection, unsavedChanges, deleteAllData } = useSurveyDataContext();
+  const { collection, collectionMetadata, siteData, setSiteData, searchQuery, setSearchQuery, saveCollection, unsavedChanges, deleteAllData } = useSurveyDataContext();
   const { geoColor, setGeoColor, QGridColumns, setQGridColumns } = useSettingsContext();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [selectedSurveyType, setSelectedSurveyType] = useState<string | null>(null);
@@ -51,12 +53,60 @@ const Toolbar = () => {
        * 
        * LINK SITE DATA
        */
-      generateExcelSurvey(collection, collectionMetadata, null);
+      generateExcelSurvey(collection, collectionMetadata, siteData);
     } catch (error) {
       console.log("Error Exporting Survey: ", error);
       addNotification("Error Occured", "error");
     }
   }
+
+  /**
+   * Handle Site File Upload
+   * @param file 
+   */
+  const handleSiteFileUpload = async (file: File) => {
+
+    try {
+      // Create a new workbook and load the file
+      const workbook = new ExcelJS.Workbook();
+      const arrayBuffer = await file.arrayBuffer();
+      await workbook.xlsx.load(arrayBuffer);
+
+      // Get the first worksheet
+      const worksheet = workbook.getWorksheet(1);
+      if (!worksheet) {
+        addNotification("Worksheet is undefined", "error")
+        console.error("Worksheet not found");
+        return;
+      }
+
+      // Extract data from each row and map it into siteData format
+      const parsedData: SiteData = [];
+      worksheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return; // Skip the header row
+        const rowData: { [key: number]: string | number | null } = {}; // Only allow string, number, or null
+
+        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+          // Only store values if they are strings or numbers
+          if (typeof cell.value === "string" || typeof cell.value === "number") {
+            rowData[colNumber] = cell.value;
+          } else {
+            rowData[colNumber] = null; // Set to null if not string or number
+            console.error("PUSHED NULL IN CELL. Cell value is neither string or numbr?");
+          }
+        });
+
+        parsedData.push(rowData);
+      });
+
+      // Set the parsed data in siteData
+      setSiteData(parsedData);
+      console.log("Site data has been set:", parsedData);
+    } catch (error) {
+      addNotification("Error adding Site Data", "error");
+      console.error("Failed to process the file", error);
+    }
+  };
 
 
   /**
@@ -111,8 +161,7 @@ const Toolbar = () => {
         <div className="group relative cursor-pointer ">
           <p className="group-hover:bg-hsl-l95 group-hover:dark:bg-hsl-l20 py-1 px-4 rounded-md font-medium">File</p>
           <div className="group-hover:flex flex-col z-50 w-max hidden absolute top-full bg-hsl-l100 dark:bg-hsl-l20 rounded-md shadow-md border border-hsl-l90 dark:border-hsl-l25">
-            <ToolbarButton label="Add Sites" icon="add-sites" fnc={() => { }} />
-            {/* <ToolbarButton label="Save Collection" icon="save" fnc={() => { }} /> */}
+            <ToolbarButton label="Add Sites" icon="add-sites" fnc={handleSiteFileUpload} />
             <button type="button" onClick={exportToExcel}
               className="group/item flex items-center gap-x-2 hover:bg-hsl-l98 hover:dark:bg-hsl-l25 px-4 py-4 rounded-md">
               <svg width={24} height={24} viewBox="0 0 50 50"
