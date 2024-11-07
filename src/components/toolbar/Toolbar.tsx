@@ -64,7 +64,12 @@ const Toolbar = () => {
    * Handle Site File Upload
    * @param file 
    */
-  const handleSiteFileUpload = async (file: File) => {
+  const handleSiteFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      addNotification("Error processing file", "error");
+      return
+    }
 
     try {
       // Create a new workbook and load the file
@@ -83,7 +88,6 @@ const Toolbar = () => {
       // Extract data from each row and map it into siteData format
       const parsedData: SiteData = [];
       worksheet.eachRow((row, rowNumber) => {
-        if (rowNumber === 1) return; // Skip the header row
         const rowData: { [key: number]: string | number | null } = {}; // Only allow string, number, or null
 
         row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
@@ -161,7 +165,14 @@ const Toolbar = () => {
         <div className="group relative cursor-pointer ">
           <p className="group-hover:bg-hsl-l95 group-hover:dark:bg-hsl-l20 py-1 px-4 rounded-md font-medium">File</p>
           <div className="group-hover:flex flex-col z-50 w-max hidden absolute top-full bg-hsl-l100 dark:bg-hsl-l20 rounded-md shadow-md border border-hsl-l90 dark:border-hsl-l25">
-            <ToolbarButton label="Add Sites" icon="add-sites" fnc={handleSiteFileUpload} />
+            <label title="Upload Sites List from Mapping"
+              className="group/item flex items-center gap-x-2 hover:bg-hsl-l98 hover:dark:bg-hsl-l25 px-4 py-4 rounded-md">
+              <IconGeneral type='add-sites'
+                className="group-hover/item:fill-g-orange group-hover/item:dark:fill-g-blue" />
+              <p className="text-sm group-hover/item:text-g-orange dark:group-hover/item:text-g-blue">Add Sites</p>
+              <input type="file" onChange={handleSiteFileUpload} className="hidden"></input>
+            </label>
+
             <button type="button" onClick={exportToExcel}
               className="group/item flex items-center gap-x-2 hover:bg-hsl-l98 hover:dark:bg-hsl-l25 px-4 py-4 rounded-md">
               <svg width={24} height={24} viewBox="0 0 50 50"
