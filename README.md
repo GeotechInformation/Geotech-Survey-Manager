@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Geotech Survey Manager
 
-## Getting Started
+This website assists in building and managing desktop surveys, storing snapshots, performing preliminary analysis on AIO data, and validating survey data for accuracy.
 
-First, run the development server:
+## Table of Contents
+1. Features
+2. Screenshots
+3. Tech Stack
+5. Contact
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
+- **Survey Builder:** Create desktop surveys easily with intuitive tools.
+- **Snapshot Management:** Store, manage, and retrieve snapshots of surveys.
+- **AIO Data Analysis:** Perform preliminary analysis on AIO data for actionable insights.
+- **Data Validation:** Validate survey data to ensure quality and consistency.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Screenshots
+### Overview / Home Page
+*The home page, where users can view an overview of the questions within a survey and navigate to different sections.*
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+![Overview](./screenshots/Overview.png)
+&nbsp;
 
-## Learn More
+### Add / Remove / Search Question
+*This section allows users to add, remove, and search for questions. Use the search bar to quickly find specific questions.*
 
-To learn more about Next.js, take a look at the following resources:
+![Overview](./screenshots/AddRemoveSearch.png)
+&nbsp;
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Create New Question
+*This section lets users create new questions, with a real-time preview showing how the question will appear in the final Excel survey.*
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+![Overview](./screenshots/CreateQuestion.png)
+&nbsp;
 
-## Deploy on Vercel
+### Prelimary Analysis Page
+*The Preliminary Analysis page enables users to upload data for initial analysis, validate survey data, and consolidate information into a single AIO file.*
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+![Overview](./screenshots/Analysis.png)
+&nbsp;
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+
+## Tech Stack
+- Frontend: Next.js, React, Tailwind CSS, Danfo, ExcelJS
+- Backend: Node.js, Firebase (Firestore database, Authentication)
+- Database: Firestore
+- Deployment: Vercel
+
+
+## Contact
+- brycep@geotechinfo.com.au
+
