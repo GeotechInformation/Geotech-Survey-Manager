@@ -39,15 +39,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     });
   };
 
-  // Effect to check localStorage and apply theme on mount
   useEffect(() => {
     const storedThemePreference = localStorage.getItem("isDarkTheme");
     if (storedThemePreference !== null) {
       setIsDarkTheme(JSON.parse(storedThemePreference));
     } else {
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setIsDarkTheme(prefersDark);
-      localStorage.setItem("isDarkTheme", JSON.stringify(prefersDark));
+      setIsDarkTheme(false); // Default to light theme if nothing is stored
+      localStorage.setItem("isDarkTheme", JSON.stringify(false));
     }
   }, []);
 
