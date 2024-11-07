@@ -15,6 +15,7 @@ export const serverConfig = {
         projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
         clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL!,
         privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/^"|"$/g, '').replace(/\\n/g, "\n")!,
+        // Replaces quotations as vercel requires string for endline
     }
 };
 
