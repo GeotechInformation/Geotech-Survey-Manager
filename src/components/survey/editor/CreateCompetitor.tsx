@@ -123,6 +123,7 @@ const CreateCompetitor = () => {
 
       // Update the collection and collectionCompetitors
       setUnsavedChanges(true);
+      setCompetitors([blankCompetitor]);
       setCollection(updatedCollection);
       setCollectionCompetitors((prevCompetitors) => prevCompetitors ? [...prevCompetitors, ...newQuestions] : newQuestions);
 
