@@ -2,6 +2,7 @@
 
 "use client";
 
+import migrateQuestions from "@/services/migrateQuestion";
 import IconGeneral from "../icons/IconGeneral";
 import { useSurveyDataContext } from "../providers/SurveyDataProvider";
 import ToolbarButton from "./ToolbarButton";
@@ -16,6 +17,19 @@ interface ToolbarAdminConsole {
 
 const ToolbarAdminConsole: React.FC<ToolbarAdminConsole> = ({ setCurAction }) => {
   const { collectionMetadata, saveCollection, unsavedChanges, deleteAllData } = useSurveyDataContext();
+
+  const doUpdateFunction = async () => {
+    // const dbs = ['CollectionNameHere'];
+    // await initializeFrequenciesFromSurveys(dbs);
+
+    // await extractSurveyTypeIDs();
+
+    // await removeSurveyTypeFromMasterCollection();
+
+    // await deleteCollectionInDB("Surevey_Training");
+
+    await migrateQuestions("BakersDelight");
+  };
 
   return (
     <div className="w-full px-4 py-1 flex justify-between items-center rounded-md shadow-sm bg-hsl-l100 dark:bg-hsl-l15 border border-hsl-l95 dark:border-none">
@@ -37,6 +51,11 @@ const ToolbarAdminConsole: React.FC<ToolbarAdminConsole> = ({ setCurAction }) =>
             {/* <ToolbarButton label="Add / Remove Questions" icon="swap" fnc={() => openEditSurveyModal('interchange')} /> */}
           </div>
         </div>
+
+        <button type="button" onClick={doUpdateFunction}
+          className="group-hover:bg-hsl-l95 group-hover:dark:bg-hsl-l20 py-1 px-4 rounded-md font-medium hover:bg-hsl-l90">
+          Do Update Fnc
+        </button>
 
 
         {/* Survey Name and Save Button */}

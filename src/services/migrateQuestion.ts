@@ -1,5 +1,5 @@
 import { OldQuestion, Question } from "@/types/Question";
-import { collection, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 /**
@@ -36,20 +36,12 @@ export default async function migrateQuestions(collectionName: string): Promise<
           min: isMaxValid ? min : 0,
           max: isMinValid ? max : 0,
           options: isMinValid ? '' : oldData.Min
-
-        },
-        surveyType: {
-          freeStand: oldData.SurveyFS === 1,
-          strip: oldData.SurveyStrip === 1,
-          shoppingCentre: oldData.SurveySC === 1,
-          foodPrecinct: oldData.SurveyFP === 1
         }
       };
 
       // Update document with new data using setDoc with merge option
       const docRef = doc(db, collectionName, docSnapshot.id);
       await setDoc(docRef, newData);
-
     }
 
     console.log(`Migration for collection ${collectionName} completed.`);

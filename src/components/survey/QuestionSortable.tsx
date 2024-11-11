@@ -2,7 +2,7 @@
 
 import { Question } from "@/types/Question";
 import { useSettingsContext } from "../providers/SettingsProvider";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import IconGeneral from "../icons/IconGeneral";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
@@ -18,6 +18,32 @@ const QuestionSortable: React.FC<QuestionSortableProps> = ({ qd }) => {
   const { searchQuery } = useSurveyDataContext();
   const [isHighlighted, setIsHighlighted] = useState<boolean>(false);
   const [color, setColor] = useState('#' + qd.color.slice(2));
+
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const [tooltipDirectionY, setTooltipDirectionY] = useState("bottom");
+  const [tooltipDirectionX, setTooltipDirectionX] = useState("right");
+
+  // Determine tooltip direction based on the viewport position
+  const handleMouseEnter = () => {
+    if (tooltipRef.current) {
+      const { top, right, bottom, left, width, height } = tooltipRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      // Calculate the element's vertical and horizontal center positions
+      const elementVerticalCenter = top + height / 2;
+      const elementHorizontalCenter = left + width / 2;
+
+      // Set horizontal direction based on the center of the element relative to the viewport width
+      if (elementHorizontalCenter > viewportWidth / 2) setTooltipDirectionX("left");
+      else setTooltipDirectionX("right");
+
+      // Set vertical direction based on the center of the element relative to the viewport height
+      if (elementVerticalCenter > viewportHeight / 2) setTooltipDirectionY("top");
+      else setTooltipDirectionY("bottom");
+
+    }
+  };
 
   // useSortable hook from dnd-kit to enable dragging
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: qd.id });
@@ -61,7 +87,7 @@ const QuestionSortable: React.FC<QuestionSortableProps> = ({ qd }) => {
 
 
   return (
-    <div
+    <div onMouseEnter={handleMouseEnter}
       ref={setNodeRef} // Set reference for the draggable item
       {...attributes} // Attach sortable attributes
       {...listeners} // Attach sortable event listeners
@@ -73,12 +99,16 @@ const QuestionSortable: React.FC<QuestionSortableProps> = ({ qd }) => {
       <p className={`text-center text-sm 
         ${geoColor ? 'text-hsl-l5' : 'dark:text-hsl-l95 text-hsl-l5'}`}>{qd.question}</p>
 
-      <div className="group-hover:flex hidden absolute top-2 right-2  items-center">
+      <div ref={tooltipRef} className="group-hover:flex hidden absolute top-2 right-2  items-center">
         <div className="group/info">
           <IconGeneral type="help" className="fill-hsl-l15 dark:fill-hsl-l15" />
 
-          <div className="group-hover/info:flex flex-col w-max max-w-[200px] justify-center items-center 
-          hidden absolute z-20 p-2 rounded-md bg-hsl-l100 shadow-lg border border-hsl-l90 dark:border-hsl-l30">
+          <div
+            className={`group-hover/info:flex flex-col w-max max-w-[300px] justify-center items-center
+            hidden absolute z-20 p-2 rounded-md bg-hsl-l100 shadow-lg border border-hsl-l90 dark:border-hsl-l30
+            ${tooltipDirectionX === 'right' ? 'left-full' : 'right-full '}
+            ${tooltipDirectionY === 'top' ? 'bottom-full ' : 'top-full  '}`}
+          >
             <p className="text-sm text-hsl-l50 text-center mb-2 font-semibold">{qd.question}</p>
             <p className="text-xs text-hsl-l50 text-center">ID: {qd.id}</p>
             <p className="text-xs text-hsl-l50 text-center">{qd.validBounds.options.length > 0 ? `Responses: ${qd.validBounds.options}` : `Min/Max: ${qd.validBounds.min} / ${qd.validBounds.max}`}</p>

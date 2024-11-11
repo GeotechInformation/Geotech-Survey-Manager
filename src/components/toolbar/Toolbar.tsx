@@ -144,21 +144,8 @@ const Toolbar = () => {
   };
 
 
-  const DO_STUFF = async () => {
-    // const dbs = ['CollectionNameHere'];
-    // await initializeFrequenciesFromSurveys(dbs);
-
-    // await extractSurveyTypeIDs();
-
-    // await removeSurveyTypeFromMasterCollection();
-
-    // await deleteCollectionInDB("Surevey_Training");
-  }
-
   return (
     <div className="w-full px-4 py-1 flex justify-between items-center rounded-md shadow-sm bg-hsl-l100 dark:bg-hsl-l15 border border-hsl-l95 dark:border-none">
-
-      {/* <button onClick={DO_STUFF}>DO_STUFF</button> */}
 
       <div className="flex gap-x-4 items-center">
         {/* FILE */}

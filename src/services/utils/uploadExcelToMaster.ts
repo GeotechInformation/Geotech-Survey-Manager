@@ -3,6 +3,20 @@ import { db } from "../../firebaseConfig";
 import * as XLSX from "xlsx";
 import { Question } from "@/types/Question";
 
+interface FlatQuestion {
+  id: string;
+  index: number;
+  question: string;
+  category: string;
+  color: string;
+  comment: string;
+  responseType: string;
+  minBound: number;
+  maxBound: number;
+  options: string;
+  frequency?: number;
+}
+
 /**
  * Upload questions from an Excel file into a new Firestore collection.
  * @param file - The Excel file to upload.
@@ -16,7 +30,7 @@ export default async function uploadExcelToMaster(file: File, newCollectionName:
     const workbook = XLSX.read(data, { type: "array" });
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
-    const questionsFromExcel: Question[] = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+    const questionsFromExcel: FlatQuestion[] = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
     // Log the parsed data to inspect the rows and check for empty ones
     console.log("Parsed Excel Data:", questionsFromExcel);
@@ -27,7 +41,7 @@ export default async function uploadExcelToMaster(file: File, newCollectionName:
     // Step 3: Upload each row as a new document in the new collection
     const uploadPromises = questionsFromExcel.map(async (questionData) => {
       // Ensure `validBounds` is correctly structured
-      const question: Question = {
+      const question = {
         id: questionData.id,
         index: questionData.index,
         question: questionData.question,
@@ -36,9 +50,9 @@ export default async function uploadExcelToMaster(file: File, newCollectionName:
         comment: questionData.comment,
         responseType: questionData.responseType,
         validBounds: {
-          min: questionData.validBounds?.min ?? 0,
-          max: questionData.validBounds?.max ?? 0,
-          options: questionData.validBounds?.options ?? "",
+          min: questionData.minBound ?? 0,
+          max: questionData.maxBound ?? 0,
+          options: questionData.options ?? "",
         },
         frequency: questionData.frequency
       };

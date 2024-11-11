@@ -70,10 +70,10 @@ const Header = () => {
       <h1 className="font-montserrat font-semibold text-2xl">{pageName}</h1>
 
       <div className="flex gap-x-8 items-center">
-        <Link href="/" className={`text-xl hover:underline px-8 p-1 rounded-md
+        <Link href="/" className={`hover:underline px-8 p-1 rounded-md
           ${pathname === '/' && "shadow bg-[length:200%_200%] animate-gradientShift bg-gradient-to-tr from-cyan-400 via-purple-400 to-red-500 text-white"}`}
-        >Create</Link>
-        <Link href="/prelim-analysis" className={`text-xl hover:underline px-8 p-1 rounded-md
+        >Creator</Link>
+        <Link href="/prelim-analysis" className={`hover:underline px-8 p-1 rounded-md
           ${pathname === '/prelim-analysis' && "shadow bg-[length:200%_200%] animate-gradientShift bg-gradient-to-tr from-cyan-400 via-purple-400 to-red-500 text-white"}`}
         >Analysis</Link>
 

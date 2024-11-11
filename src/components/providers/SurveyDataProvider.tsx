@@ -179,7 +179,7 @@ export const SurveyDataProvider: React.FC<{ children: ReactNode }> = ({ children
         await updateQuestionFrequency(question.id, false, 1);
       }
 
-      addNotification("Template survey created successfully!", "success");
+      addNotification("Click Save to Save Template To Database", "neutral");
     } catch (error) {
       addNotification("Error updating frequency. Can be ignored", "neutral")
       console.error(error);

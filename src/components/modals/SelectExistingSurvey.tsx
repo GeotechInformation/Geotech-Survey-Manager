@@ -54,7 +54,7 @@ const SelectExistingSurvey: React.FC<SelectExistingSurveyProps> = ({ onClose }) 
         const filteredMetadata = metadata.filter(
           (item) =>
           (!item.deleted && // Exclude collections with a "deleted" field
-            (isAdmin || (item.name !== "#_MasterCollection" && item.name !== "AAA_CompetitorCollection")))
+            (isAdmin || (item.name !== "AAA_MasterCollection" && item.name !== "AAA_CompetitorCollection")))
         );
 
         const groupedMetadata = groupByFirstLetter(filteredMetadata);
@@ -113,7 +113,7 @@ const SelectExistingSurvey: React.FC<SelectExistingSurveyProps> = ({ onClose }) 
           <IconGeneral type="close" className="fill-white dark:fill-white" />
         </button>
 
-        <h2 className="font-semibold mb-4 text-center">Select Existig Survey</h2>
+        <h2 className="font-semibold mb-4 text-center">Select Exiting Survey</h2>
 
         <div className="flex flex-col flex-grow overflow-y-scroll custom-scrollbar">
           {surveyMetadata ? (
