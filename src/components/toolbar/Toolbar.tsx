@@ -13,11 +13,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import ToolbarButton from "./ToolbarButton";
 import dynamic from "next/dynamic";
 import ExcelJS from "exceljs";
-
-import initializeFrequenciesFromSurveys from "@/services/database/initFreqFromSurveys";
-import { extractSurveyTypeIDs } from "@/services/extractSurveyType";
-import { removeSurveyTypeFromMasterCollection } from "@/services/removeSurveyType";
-import deleteCollectionInDB from "@/services/database/deleteCollectionInDB";
 import { SiteData } from "@/types/SiteData";
 
 type EditActionType = 'none' | 'interchange' | 'createQuestion' | 'editQuestion' | 'createComp';
@@ -27,7 +22,12 @@ const DynSelectExistingSurveyModal = dynamic(() => import("../modals/SelectExist
 const DynEditQuestionModal = dynamic(() => import("../modals/EditCollectionQuestions"), { loading: () => <></> });
 
 
-const Toolbar = () => {
+interface ToolBarProps {
+  isPreviewVisible: boolean;
+  togglePreviewer: () => void;
+}
+
+const Toolbar: React.FC<ToolBarProps> = ({ isPreviewVisible, togglePreviewer }) => {
   const { addNotification } = useNotification();
   const { collection, collectionMetadata, siteData, setSiteData, searchQuery, setSearchQuery, saveCollection, unsavedChanges, deleteAllData } = useSurveyDataContext();
   const { geoColor, setGeoColor, QGridColumns, setQGridColumns } = useSettingsContext();
@@ -231,12 +231,12 @@ const Toolbar = () => {
           <IconLogo className={`${!geoColor && 'fill-hsl-l20 dark:fill-hsl-l80'}`} />
         </button>
 
-        <button type="button" title="Preview as Excel" onClick={() => { }}
+        <button type="button" title="Preview as Excel" onClick={togglePreviewer}
           className="px-2 py-2 hover:bg-hsl-l95 hover:dark:bg-hsl-l20 rounded-md flex-shrink-0">
-          <IconGeneral type="preview" />
+          <IconGeneral type="preview" className={`${isPreviewVisible ? "fill-g-orange dark:fill-g-blue" : ''}`} />
         </button>
 
-        <button type="button" title="Delete All" onClick={deleteAllData}
+        <button type="button" title="Clear All" onClick={deleteAllData}
           className="group px-2 py-2 hover:bg-hsl-l95 hover:dark:bg-hsl-l20 rounded-md flex-shrink-0">
           <IconGeneral type="delete" className="group-hover:fill-red-500 group-hover:dark:fill-red-600" />
         </button>
