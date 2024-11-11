@@ -247,7 +247,7 @@ const CreateCompetitor = () => {
                 <button type="button" onClick={() => toggleCompetitorField(idx, 'in500')}
                   className={`text-sm px-2 py-1 rounded-sm  border border-hsl-l95 dark:border-hsl-l30 hover:border-g-orange dark:hover:border-g-blue
               ${comp.in500 ? 'bg-g-orange dark:bg-g-blue text-white' : 'bg-hsl-l95 dark:bg-hsl-l20'}`}>
-                  In 500
+                  In 500m
                 </button>
 
                 <input type="text" placeholder="Custom"

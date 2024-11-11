@@ -62,7 +62,7 @@ const Header = () => {
   );
 
   return (
-    <header className="w-full mt-2 py-4 px-8 flex flex-initial justify-between items-center">
+    <header className="w-full mt-2 py-3 px-8 flex flex-initial justify-between items-center">
       <Link href="/" className="w-[150px] max-h-[50px] relative">
         <img src="/geotech-info-services.png" alt="Geotech Logo" className="w-full h-full object-contain" />
       </Link>
@@ -70,8 +70,12 @@ const Header = () => {
       <h1 className="font-montserrat font-semibold text-2xl">{pageName}</h1>
 
       <div className="flex gap-x-8 items-center">
-        <Link href="/" className="font-medium text-xl hover:underline">Create</Link>
-        <Link href="/prelim-analysis" className="font-medium text-xl hover:underline">Analysis</Link>
+        <Link href="/" className={`text-xl hover:underline px-8 p-1 rounded-md
+          ${pathname === '/' && "shadow bg-[length:200%_200%] animate-gradientShift bg-gradient-to-tr from-cyan-400 via-purple-400 to-red-500 text-white"}`}
+        >Create</Link>
+        <Link href="/prelim-analysis" className={`text-xl hover:underline px-8 p-1 rounded-md
+          ${pathname === '/prelim-analysis' && "shadow bg-[length:200%_200%] animate-gradientShift bg-gradient-to-tr from-cyan-400 via-purple-400 to-red-500 text-white"}`}
+        >Analysis</Link>
 
         {loading ? null : (
           !user ? (
